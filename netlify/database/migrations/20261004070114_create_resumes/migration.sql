@@ -1,0 +1,22 @@
+CREATE TABLE "resumes" (
+	"id" serial PRIMARY KEY,
+	"slug" text NOT NULL UNIQUE,
+	"edit_token" text NOT NULL,
+	"name" text NOT NULL,
+	"age" text DEFAULT '' NOT NULL,
+	"location" text DEFAULT '' NOT NULL,
+	"headline" text DEFAULT '' NOT NULL,
+	"objective" text DEFAULT '' NOT NULL,
+	"looking_for" text DEFAULT '' NOT NULL,
+	"qualities" jsonb DEFAULT '[]' NOT NULL,
+	"likes" jsonb DEFAULT '[]' NOT NULL,
+	"dislikes" jsonb DEFAULT '[]' NOT NULL,
+	"dealbreakers" jsonb DEFAULT '[]' NOT NULL,
+	"love_languages" jsonb DEFAULT '[]' NOT NULL,
+	"experience" jsonb DEFAULT '[]' NOT NULL,
+	"references" jsonb DEFAULT '[]' NOT NULL,
+	"contact" text DEFAULT '' NOT NULL,
+	"accent" text DEFAULT 'rose' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
