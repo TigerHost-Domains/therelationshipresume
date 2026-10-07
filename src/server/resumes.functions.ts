@@ -1,12 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import type { User } from '@netlify/identity'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, desc, eq, isNull, or, sql } from 'drizzle-orm'
 import { customAlphabet } from 'nanoid'
 import { z } from 'zod'
 import { db } from '../../db/index.js'
 import { resumes } from '../../db/schema.js'
 import { resumeInputSchema, type Resume } from '@/lib/resume'
-import { identityMiddleware, requireAuthMiddleware } from '@/middleware/identity'
+import { identityMiddleware, requireAuthMiddleware, requireSignInMiddleware } from '@/middleware/identity'
 
 const slugId = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 6)
 const tokenId = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789', 32)
@@ -149,4 +149,39 @@ export const getEditAccess = createServerFn({ method: 'GET' })
     const row = await findRow(data.slug)
     if (!row) return { canEdit: false, unowned: false }
     return { canEdit: access(row, context.user).canEdit, unowned: !row.ownerId }
+  })
+
+/**
+ * The signed-in member's resumes for their account page: ones they own plus ones they've been invited to co-edit.
+ * Links are public anyway, so this asks for sign-in but not a two-factor code.
+ */
+export const listMyResumes = createServerFn({ method: 'GET' })
+  .middleware([requireSignInMiddleware])
+  .handler(async ({ context }) => {
+    const email = context.user.email?.toLowerCase()
+    const rows = await db
+      .select({
+        slug: resumes.slug,
+        name: resumes.name,
+        headline: resumes.headline,
+        accent: resumes.accent,
+        ownerId: resumes.ownerId,
+        updatedAt: resumes.updatedAt,
+      })
+      .from(resumes)
+      .where(
+        email
+          ? or(eq(resumes.ownerId, context.user.id), sql`${resumes.editorEmails} @> ${JSON.stringify([email])}::jsonb`)
+          : eq(resumes.ownerId, context.user.id),
+      )
+      .orderBy(desc(resumes.updatedAt))
+      .limit(100)
+    return rows.map((r) => ({
+      slug: r.slug,
+      name: r.name,
+      headline: r.headline,
+      accent: r.accent as Resume['accent'],
+      role: r.ownerId === context.user.id ? ('owner' as const) : ('co-editor' as const),
+      updatedAt: r.updatedAt.toISOString(),
+    }))
   })
