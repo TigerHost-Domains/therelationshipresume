@@ -25,7 +25,7 @@ export function SiteHeader({ tone = 'light' }: { tone?: Tone }) {
       ? 'whitespace-nowrap px-2 py-2 text-sm text-smoke transition hover:text-cream sm:px-3'
       : 'whitespace-nowrap px-2 py-2 text-sm text-ink-soft hover:text-ink sm:px-3'
   return (
-    <header className="no-print relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-5 sm:px-6">
+    <header className="no-print relative z-10 mx-auto flex max-w-site items-center justify-between gap-3 px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
       <Link to="/" className="flex items-center gap-3">
         <Monogram className={tone === 'dark' ? 'border-gold/50 text-gold-bright' : ''} />
         <span className="font-display text-base leading-tight tracking-tight sm:text-lg">
@@ -67,7 +67,7 @@ export function SiteHeader({ tone = 'light' }: { tone?: Tone }) {
 export function SiteFooter({ tone = 'light' }: { tone?: Tone }) {
   return (
     <footer
-      className={`no-print relative z-10 mx-auto max-w-6xl border-t px-6 py-8 text-sm ${
+      className={`no-print relative z-10 mx-auto max-w-site border-t px-6 py-8 text-sm lg:px-10 ${
         tone === 'dark' ? 'border-ember text-smoke' : 'mt-24 border-rule text-ink-soft'
       }`}
     >

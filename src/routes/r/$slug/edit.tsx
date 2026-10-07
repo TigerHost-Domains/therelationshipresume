@@ -54,9 +54,9 @@ function EditPage() {
   return (
     <>
       <SiteHeader />
-      <div className="mx-auto max-w-[1400px] px-4 pt-6 pb-8 sm:px-6">
+      <div className="mx-auto max-w-studio px-4 pt-6 pb-8 sm:px-6 lg:px-10 lg:pt-8 lg:pb-10">
         <p className="label text-rose">Revisions</p>
-        <h1 className="mt-2 font-display text-4xl font-medium tracking-tight sm:text-5xl">Update your resume</h1>
+        <h1 className="mt-2 font-display text-4xl font-medium tracking-tight sm:text-5xl xl:text-6xl">Update your resume</h1>
         {result.canManage ? <CoEditors slug={slug} initial={result.editors} /> : null}
       </div>
       <ResumeEditor

@@ -17,7 +17,7 @@ function Step({ n, title, hint, children }: { n: string; title: string; hint?: s
       <legend className="contents">
         <div className="flex items-baseline gap-3">
           <span className="font-mono text-xs text-rose">{n}</span>
-          <h2 className="font-display text-2xl font-medium tracking-tight">{title}</h2>
+          <h2 className="font-display text-2xl font-medium tracking-tight xl:text-[1.75rem]">{title}</h2>
         </div>
         {hint ? <p className="mt-1 text-sm text-ink-soft">{hint}</p> : null}
       </legend>
@@ -186,7 +186,7 @@ export function ResumeEditor({
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
+    <div className="mx-auto max-w-studio px-4 sm:px-6 lg:px-10">
       <div className="no-print sticky top-0 z-10 -mx-4 mb-6 flex gap-2 bg-paper/90 px-4 py-3 backdrop-blur lg:hidden">
         {(['edit', 'preview'] as const).map((v) => (
           <button
@@ -201,8 +201,8 @@ export function ResumeEditor({
         ))}
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <form onSubmit={submit} className={`space-y-8 pb-16 ${mobileView === 'preview' ? 'hidden lg:block' : ''}`}>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:gap-14 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] 2xl:gap-20">
+        <form onSubmit={submit} className={`space-y-8 pb-16 xl:space-y-10 ${mobileView === 'preview' ? 'hidden lg:block' : ''}`}>
           <Step n="01" title="The basics" hint="How you'd introduce yourself at the top of the page.">
             <div className="grid gap-4 sm:grid-cols-[1fr_6rem]">
               <Field label="Name *">

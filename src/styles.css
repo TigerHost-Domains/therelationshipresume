@@ -7,6 +7,11 @@
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
+  /* Page widths: marketing + chrome, the shared resume page, and the side-by-side builder */
+  --container-site: 88rem;
+  --container-page: 74rem;
+  --container-studio: 116rem;
+
   --color-paper: #f5eee3;
   --color-sheet: #fffdf8;
   --color-ink: #1f1a17;
@@ -67,9 +72,33 @@
 @layer base {
   html {
     background: var(--color-paper);
+    /* Type scales gently from 16px on laptops to ~18px on large desktop displays */
+    font-size: clamp(100%, 0.82rem + 0.25vw, 112.5%);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     @apply m-0 bg-paper text-ink font-sans antialiased;
+    line-height: 1.6;
+    font-kerning: normal;
+    font-optical-sizing: auto;
+    font-feature-settings: 'kern', 'liga', 'calt';
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote,
+  figcaption {
+    text-wrap: pretty;
+  }
+  blockquote {
+    hanging-punctuation: first last;
   }
   ::selection {
     background: var(--color-blush);
@@ -140,6 +169,9 @@
 }
 
 @media print {
+  html {
+    font-size: 100%;
+  }
   .no-print {
     display: none !important;
   }

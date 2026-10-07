@@ -111,17 +111,17 @@ function Landing() {
 
 function Hero() {
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-16 px-6 pt-8 pb-24 lg:grid-cols-[1.1fr_1fr] lg:pt-14">
+    <section className="mx-auto grid max-w-site items-center gap-16 px-6 pt-8 pb-24 lg:grid-cols-[1.1fr_1fr] lg:px-10 lg:pt-14 xl:gap-24 xl:pb-32">
       <div>
         <p className="label inline-flex animate-in items-center gap-2 rounded-full border border-gold/30 bg-velvet/70 px-3 py-1.5 text-gold-bright fade-in fill-mode-both duration-700">
           <Heart className="size-3 animate-pulse-heart fill-rose text-rose motion-safe-only" />
           Now accepting applications
         </p>
-        <h1 className="mt-7 animate-in font-display text-[3.4rem] leading-[0.92] font-medium tracking-tight fade-in slide-in-from-bottom-4 fill-mode-both delay-100 duration-700 sm:text-[5.5rem]">
+        <h1 className="mt-7 animate-in font-display text-[3.4rem] leading-[0.92] font-medium tracking-tight fade-in slide-in-from-bottom-4 fill-mode-both delay-100 duration-700 sm:text-[5.5rem] xl:text-[6.5rem] 2xl:text-[7.25rem]">
           We’re here to find <em className="gold-foil pr-2 font-semibold">love,</em>
           <span className="block text-rose italic">baby.</span>
         </h1>
-        <p className="mt-7 max-w-lg animate-in text-lg leading-relaxed text-smoke fade-in slide-in-from-bottom-3 fill-mode-both delay-200 duration-700">
+        <p className="mt-7 max-w-[34rem] animate-in text-lg leading-relaxed text-smoke xl:text-xl xl:leading-relaxed fade-in slide-in-from-bottom-3 fill-mode-both delay-200 duration-700">
           Dating profiles show what you look like. A Relationship Resume shows what it’s like to love you: what you
           adore, what you won’t tolerate, and why you’re worth the second date. One page, one link.
         </p>
@@ -145,7 +145,7 @@ function Hero() {
         <div className="absolute inset-0 translate-x-6 translate-y-5 rotate-[5deg] rounded-sm bg-velvet-soft" aria-hidden />
         <div className="absolute inset-0 -translate-x-4 translate-y-3 -rotate-[4deg] rounded-sm bg-cream/80" aria-hidden />
         <div
-          className="relative max-h-[540px] animate-drift overflow-hidden rounded-sm shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] motion-safe-only [--tilt:-1.5deg]"
+          className="relative max-h-[540px] animate-drift xl:max-h-[640px] overflow-hidden rounded-sm shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] motion-safe-only [--tilt:-1.5deg]"
         >
           <ResumeSheet resume={sampleResume} compact />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-sheet to-transparent" />
@@ -194,21 +194,21 @@ function Marquee() {
 
 function OnTheRecord() {
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-28" aria-labelledby="on-the-record">
+    <section className="mx-auto max-w-site px-6 pt-28 lg:px-10 xl:pt-36" aria-labelledby="on-the-record">
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <p className="label text-gold">Proof of concept</p>
-          <h2 id="on-the-record" className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl">
+          <h2 id="on-the-record" className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
             Black love, <em className="gold-foil">on the record.</em>
           </h2>
         </div>
-        <p className="max-w-md text-smoke lg:justify-self-end">
+        <p className="max-w-md text-lg leading-relaxed text-smoke lg:justify-self-end">
           Tender, joyful, and built to last. Here’s to the partnerships with a track record worth putting on paper,
           and to yours being next.
         </p>
       </div>
 
-      <div className="mt-14 grid auto-rows-[170px] grid-cols-2 gap-4 sm:auto-rows-[220px] lg:auto-rows-[150px] lg:grid-cols-12 lg:gap-5">
+      <div className="mt-14 grid auto-rows-[170px] grid-cols-2 gap-4 sm:auto-rows-[220px] lg:auto-rows-[150px] lg:grid-cols-12 lg:gap-5 xl:auto-rows-[185px] 2xl:auto-rows-[215px]">
         {PHOTOS.map(({ src, alt, tag, className }) => (
           <figure
             key={src}
@@ -250,24 +250,24 @@ function OnTheRecord() {
 
 function HowItWorks() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-28">
+    <section className="mx-auto max-w-site px-6 py-28 lg:px-10 xl:py-36">
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
         <div>
           <p className="label text-gold">How it works</p>
-          <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl">
+          <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
             Skip the small talk. <em className="text-rose">Send the summary.</em>
           </h2>
         </div>
-        <p className="max-w-md text-smoke lg:justify-self-end">
+        <p className="max-w-md text-lg leading-relaxed text-smoke lg:justify-self-end">
           Five minutes from blank page to a beautifully set, one-page case for why you’re a catch.
         </p>
       </div>
 
-      <ol className="mt-16 grid gap-5 md:grid-cols-3">
+      <ol className="mt-16 grid gap-5 md:grid-cols-3 xl:gap-7">
         {STEPS.map(({ no, tag, icon: Icon, title, body }, i) => (
           <li
             key={no}
-            className={`group relative rounded-2xl border border-ember bg-velvet/80 p-7 transition duration-300 hover:-translate-y-1 hover:border-gold/50 ${
+            className={`group relative rounded-2xl border border-ember bg-velvet/80 p-7 transition duration-300 hover:-translate-y-1 hover:border-gold/50 xl:p-9 ${
               i === 1 ? 'md:translate-y-10 md:hover:translate-y-9' : ''
             }`}
           >
@@ -280,7 +280,7 @@ function HowItWorks() {
             <span className="mt-6 block font-display text-7xl leading-none text-cream/10 transition group-hover:text-rose/40">
               {no}
             </span>
-            <h3 className="mt-2 font-display text-2xl text-cream">{title}</h3>
+            <h3 className="mt-2 font-display text-2xl text-cream xl:text-[1.75rem]">{title}</h3>
             <p className="mt-2 leading-relaxed text-smoke">{body}</p>
           </li>
         ))}
@@ -291,14 +291,14 @@ function HowItWorks() {
 
 function Lounge() {
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-10 pb-28">
+    <section className="mx-auto max-w-site px-6 pt-10 pb-28 lg:px-10 xl:pb-36">
       <p className="label text-gold">The members’ lounge</p>
-      <h2 className="mt-4 max-w-2xl font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl">
+      <h2 className="mt-4 max-w-3xl font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl xl:text-6xl">
         Your love life, <em className="gold-foil">under lock and key.</em>
       </h2>
 
-      <div className="mt-14 grid gap-5 md:grid-cols-6">
-        <article className="relative overflow-hidden rounded-2xl border border-ember bg-gradient-to-br from-velvet-soft to-velvet p-8 md:col-span-4">
+      <div className="mt-14 grid gap-5 md:grid-cols-6 xl:gap-7">
+        <article className="relative overflow-hidden rounded-2xl border border-ember bg-gradient-to-br from-velvet-soft to-velvet p-8 xl:p-10 md:col-span-4">
           <KeyRound className="size-6 text-gold-bright" />
           <h3 className="mt-5 font-display text-3xl text-cream">Only you hold the pen.</h3>
           <p className="mt-3 max-w-md leading-relaxed text-smoke">
@@ -310,7 +310,7 @@ function Lounge() {
           </div>
         </article>
 
-        <article className="rounded-2xl border border-rose/30 bg-rose/10 p-8 md:col-span-2">
+        <article className="rounded-2xl border border-rose/30 bg-rose/10 p-8 xl:p-10 md:col-span-2">
           <Users className="size-6 text-rose" />
           <h3 className="mt-5 font-display text-2xl text-cream">Bring a wingperson.</h3>
           <p className="mt-3 leading-relaxed text-smoke">
@@ -318,7 +318,7 @@ function Lounge() {
           </p>
         </article>
 
-        <article className="rounded-2xl border border-ember bg-velvet/80 p-8 md:col-span-3">
+        <article className="rounded-2xl border border-ember bg-velvet/80 p-8 xl:p-10 md:col-span-3">
           <ShieldCheck className="size-6 text-gold-bright" />
           <h3 className="mt-5 font-display text-2xl text-cream">A second reference check.</h3>
           <p className="mt-3 leading-relaxed text-smoke">
@@ -327,7 +327,7 @@ function Lounge() {
           </p>
         </article>
 
-        <article className="rounded-2xl border border-ember bg-velvet/80 p-8 md:col-span-3">
+        <article className="rounded-2xl border border-ember bg-velvet/80 p-8 xl:p-10 md:col-span-3">
           <p className="label text-gold">Sign in your way</p>
           <h3 className="mt-4 font-display text-2xl text-cream">One tap and you’re on the list.</h3>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -345,13 +345,13 @@ function Lounge() {
 
 function Example() {
   return (
-    <section id="example" className="relative scroll-mt-6 bg-paper py-28 text-ink">
+    <section id="example" className="relative scroll-mt-6 bg-paper py-28 text-ink xl:py-36">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" aria-hidden />
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      <div className="mx-auto max-w-page px-4 sm:px-6">
         <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div>
             <p className="label text-rose">Example application</p>
-            <h2 className="mt-3 font-display text-4xl tracking-tight sm:text-6xl">
+            <h2 className="mt-3 font-display text-4xl tracking-tight sm:text-6xl xl:text-7xl">
               Meet Juniper. <em className="text-rose">Very employable.</em>
             </h2>
           </div>
@@ -367,8 +367,8 @@ function Example() {
 
 function Companion() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-28">
-      <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-velvet-soft via-velvet to-night p-10 sm:p-14">
+    <section className="mx-auto max-w-site px-6 py-28 lg:px-10 xl:py-36">
+      <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-velvet-soft via-velvet to-night p-10 sm:p-14 xl:p-20">
         <div
           className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full bg-gold/10 blur-3xl"
           aria-hidden
@@ -376,10 +376,10 @@ function Companion() {
         <div className="relative grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div>
             <p className="label text-gold">A companion to The Social Match Game</p>
-            <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl xl:text-6xl">
               Found your people? <em className="text-rose">Now send your resume.</em>
             </h2>
-            <p className="mt-5 max-w-lg leading-relaxed text-smoke">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-smoke">
               The Social Match Game is where you meet the community and the details that make each member themselves.
               The Relationship Resume is the follow-up: the one page that tells your match what a second date would
               actually be like.
@@ -406,9 +406,9 @@ function Companion() {
 
 function Closing() {
   return (
-    <section className="mx-auto max-w-3xl px-6 pt-6 pb-32 text-center">
+    <section className="mx-auto max-w-4xl px-6 pt-6 pb-32 text-center xl:max-w-5xl xl:pb-40">
       <Heart className="mx-auto size-8 animate-pulse-heart fill-rose text-rose motion-safe-only" />
-      <p className="mt-8 font-display text-3xl leading-snug italic sm:text-[2.6rem]">
+      <p className="mt-8 font-display text-3xl leading-snug italic sm:text-[2.6rem] xl:text-[3.25rem] xl:leading-[1.2]">
         “The position of <span className="gold-foil not-italic">great love</span> is open. Applications close when
         you stop looking.”
       </p>
