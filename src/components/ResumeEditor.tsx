@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Eye, PenLine, Plus, Sparkles, Trash2, X } from 'lucide-react'
 import { ResumeSheet } from '@/components/ResumeSheet'
 import {
@@ -134,15 +134,23 @@ export function ResumeEditor({
   initial,
   submitLabel,
   onSubmit,
+  onChange,
 }: {
   initial: ResumeInput
   submitLabel: string
   onSubmit: (resume: ResumeInput) => Promise<void>
+  /** Called with the work in progress after every change (used to autosave drafts). */
+  onChange?: (resume: ResumeInput) => void
 }) {
   const [resume, setResume] = useState<ResumeInput>(initial)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
+
+  useEffect(() => {
+    onChange?.(resume)
+    // Only the content matters here; a new onChange identity on each parent render shouldn't re-save.
+  }, [resume])
 
   const set = <K extends keyof ResumeInput>(key: K, value: ResumeInput[K]) =>
     setResume((r) => ({ ...r, [key]: value }))

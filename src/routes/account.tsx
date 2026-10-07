@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { createFileRoute, Link, redirect, useRouter } from '@tanstack/react-router'
-import { Check, Copy, FileText, PenLine, ShieldCheck } from 'lucide-react'
+import { Check, Copy, FileText, PenLine, Plus, ShieldCheck } from 'lucide-react'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
+import { SocialMatchButton } from '@/components/SocialMatchConnect'
 import { getServerUser } from '@/lib/auth'
 import { useIdentity } from '@/lib/identity-context'
 import { ACCENTS } from '@/lib/resume'
@@ -166,54 +167,61 @@ function MyResumes({ resumes }: { resumes: MyResume[] }) {
             {resumes.length
               ? 'Every resume on file under your name, plus any you’ve been asked to co-edit. Share the link with anyone worth interviewing.'
               : 'No applications on file yet. Write one and its link will be kept here.'}
+            {resumes.length ? ' You can also pin any of them to your Social Match Game profile.' : null}
           </p>
         </div>
       </div>
 
       {resumes.length ? (
-        <ul className="mt-6 divide-y divide-rule border-y border-rule">
-          {resumes.map((r) => {
-            const path = `/r/${r.slug}`
-            return (
-              <li key={r.slug} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
-                <span
-                  className="size-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: ACCENTS[r.accent]?.color }}
-                  aria-hidden
-                />
-                <div className="min-w-0 flex-1">
-                  <Link to="/r/$slug" params={{ slug: r.slug }} className="font-display text-lg hover:underline">
-                    {r.name}
-                  </Link>
-                  {r.role === 'co-editor' ? <span className="label ml-2 text-ink-soft">Co-editor</span> : null}
-                  {r.headline ? <p className="truncate text-sm text-ink-soft">{r.headline}</p> : null}
-                  <p className="mt-0.5 break-all font-mono text-xs text-ink-soft">
-                    {origin}
-                    {path}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1 text-ink-soft hover:text-ink"
-                    onClick={() => void copy(r.slug)}
-                  >
-                    {copied === r.slug ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                    {copied === r.slug ? 'Copied' : 'Copy link'}
-                  </button>
-                  <Link
-                    to="/r/$slug/edit"
-                    params={{ slug: r.slug }}
-                    className="inline-flex items-center gap-1 text-ink-soft hover:text-ink"
-                  >
-                    <PenLine className="size-3.5" />
-                    Edit
-                  </Link>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        <>
+          <ul className="mt-6 divide-y divide-rule border-y border-rule">
+            {resumes.map((r) => {
+              const path = `/r/${r.slug}`
+              return (
+                <li key={r.slug} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
+                  <span
+                    className="size-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: ACCENTS[r.accent]?.color }}
+                    aria-hidden
+                  />
+                  <div className="min-w-0 flex-1">
+                    <Link to="/r/$slug" params={{ slug: r.slug }} className="font-display text-lg hover:underline">
+                      {r.name}
+                    </Link>
+                    {r.role === 'co-editor' ? <span className="label ml-2 text-ink-soft">Co-editor</span> : null}
+                    {r.headline ? <p className="truncate text-sm text-ink-soft">{r.headline}</p> : null}
+                    <p className="mt-0.5 break-all font-mono text-xs text-ink-soft">
+                      {origin}
+                      {path}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 text-sm">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 text-ink-soft hover:text-ink"
+                      onClick={() => void copy(r.slug)}
+                    >
+                      {copied === r.slug ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                      {copied === r.slug ? 'Copied' : 'Copy link'}
+                    </button>
+                    <Link
+                      to="/r/$slug/edit"
+                      params={{ slug: r.slug }}
+                      className="inline-flex items-center gap-1 text-ink-soft hover:text-ink"
+                    >
+                      <PenLine className="size-3.5" />
+                      Edit
+                    </Link>
+                    <SocialMatchButton slug={r.slug} compact returnTo="/account" />
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+          <Link to="/create" className="btn-ghost mt-6">
+            <Plus className="size-4" /> Write another resume
+          </Link>
+        </>
       ) : (
         <Link to="/create" className="btn-primary mt-6 inline-block">
           Write your resume

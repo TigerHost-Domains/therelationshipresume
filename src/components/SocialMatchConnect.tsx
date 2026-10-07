@@ -6,20 +6,39 @@ import { SOCIAL_MATCH_API, SOCIAL_MATCH_SITE } from '@/lib/social-match'
 import { cn } from '@/lib/utils'
 import { pushToSocialMatch } from '@/server/resumes.functions'
 
-/** Opens the dialog that adds this resume to the member's Social Match Game profile. */
-export function SocialMatchButton({ slug, className }: { slug: string; className?: string }) {
+/**
+ * Opens the dialog that adds this resume to the member's Social Match Game profile. `compact` renders a small text
+ * action for lists (the account page); `returnTo` is where a 2FA prompt sends the member back to.
+ */
+export function SocialMatchButton({
+  slug,
+  className,
+  compact,
+  returnTo,
+}: {
+  slug: string
+  className?: string
+  compact?: boolean
+  returnTo?: string
+}) {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button type="button" className={cn('btn-ghost', className)} onClick={() => setOpen(true)}>
-        <Heart className="size-4" /> Add to Social Match
+      <button
+        type="button"
+        className={cn(compact ? 'inline-flex items-center gap-1 text-ink-soft hover:text-ink' : 'btn-ghost', className)}
+        onClick={() => setOpen(true)}
+      >
+        <Heart className={compact ? 'size-3.5' : 'size-4'} /> Add to Social Match
       </button>
-      {open ? <SocialMatchDialog slug={slug} onClose={() => setOpen(false)} /> : null}
+      {open ? (
+        <SocialMatchDialog slug={slug} returnTo={returnTo ?? `/r/${slug}`} onClose={() => setOpen(false)} />
+      ) : null}
     </>
   )
 }
 
-function SocialMatchDialog({ slug, onClose }: { slug: string; onClose: () => void }) {
+function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo: string; onClose: () => void }) {
   const navigate = useNavigate()
   const dialog = useRef<HTMLDialogElement>(null)
   const [email, setEmail] = useState('')
@@ -49,7 +68,7 @@ function SocialMatchDialog({ slug, onClose }: { slug: string; onClose: () => voi
       }
     } catch (err) {
       if (err instanceof Error && err.message === MFA_REQUIRED) {
-        await navigate({ to: '/login', search: { mode: 'mfa', redirect: `/r/${slug}` } })
+        await navigate({ to: '/login', search: { mode: 'mfa', redirect: returnTo } })
         return
       }
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
