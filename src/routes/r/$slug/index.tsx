@@ -4,6 +4,7 @@ import { Check, Copy, PenLine, Printer } from 'lucide-react'
 import { z } from 'zod'
 import { ResumeSheet } from '@/components/ResumeSheet'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
+import { SocialMatchButton } from '@/components/SocialMatchConnect'
 import { getEditKey } from '@/lib/edit-keys'
 import { useIdentity } from '@/lib/identity-context'
 import { getEditAccess, getResume } from '@/server/resumes.functions'
@@ -107,6 +108,14 @@ function ResumePage() {
                 </div>
               ))}
             </div>
+            {canEdit ? (
+              <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-rose/20 pt-4">
+                <p className="flex-1 text-sm text-ink-soft">
+                  On The Social Match Game? Pin this resume to your profile so matches can read the full application.
+                </p>
+                <SocialMatchButton slug={slug} className="bg-sheet" />
+              </div>
+            ) : null}
           </div>
         ) : null}
 
@@ -118,6 +127,7 @@ function ResumePage() {
           <button type="button" className="btn-ghost" onClick={() => window.print()}>
             <Printer className="size-4" /> Print
           </button>
+          {canEdit ? <SocialMatchButton slug={slug} /> : null}
           {showEdit ? (
             <Link to="/r/$slug/edit" params={{ slug }} search={{ key: claimKey }} className="btn-ghost">
               <PenLine className="size-4" /> Edit

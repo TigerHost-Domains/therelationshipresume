@@ -7,6 +7,7 @@ import { db } from '../../db/index.js'
 import { resumes } from '../../db/schema.js'
 import { resumeInputSchema, type Resume } from '@/lib/resume'
 import { identityMiddleware, requireAuthMiddleware, requireSignInMiddleware } from '@/middleware/identity'
+import { linkResumeToProfile, SocialMatchError } from '@/server/social-match'
 
 const slugId = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 6)
 const tokenId = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789', 32)
@@ -184,4 +185,27 @@ export const listMyResumes = createServerFn({ method: 'GET' })
       role: r.ownerId === context.user.id ? ('owner' as const) : ('co-editor' as const),
       updatedAt: r.updatedAt.toISOString(),
     }))
+  })
+
+/**
+ * Adds a published resume to the member's Social Match Game profile. Their Social Match Game email and password are
+ * forwarded once to sign in there and are never stored or logged.
+ */
+export const pushToSocialMatch = createServerFn({ method: 'POST' })
+  .middleware([requireAuthMiddleware])
+  .inputValidator(
+    z.object({ slug: slugInput, email: z.email().max(254), password: z.string().min(1).max(200) }),
+  )
+  .handler(async ({ data, context }) => {
+    const row = await findRow(data.slug)
+    if (!row || !access(row, context.user).canEdit) {
+      return { ok: false as const, error: 'Only people who can edit this resume can add it to a profile.' }
+    }
+    try {
+      const profileUrl = await linkResumeToProfile(row.slug, data.email.trim(), data.password)
+      return { ok: true as const, profileUrl }
+    } catch (err) {
+      if (err instanceof SocialMatchError) return { ok: false as const, error: err.message }
+      throw err
+    }
   })
