@@ -46,6 +46,44 @@ const SECTIONS = [
   'References',
 ]
 
+const PHOTOS = [
+  {
+    src: '/images/black-love/field-embrace.jpg',
+    alt: 'A Black couple embracing in a sunlit field, the man resting his head on the woman’s arm',
+    tag: 'Exhibit A · Long-term position',
+    credit: { name: 'Ricardo Esquivel', url: 'https://unsplash.com/photos/O8i3pW1leYs' },
+    className: 'col-span-2 row-span-2 lg:col-span-5 lg:row-span-4',
+  },
+  {
+    src: '/images/black-love/forehead-kiss.jpg',
+    alt: 'A Black man kissing his partner’s forehead outdoors on a bright day',
+    tag: 'References: glowing',
+    credit: { name: 'LaShawn Dobbs', url: 'https://unsplash.com/photos/Qx-jCqiTezY' },
+    className: 'col-span-2 lg:col-span-4 lg:row-span-2',
+  },
+  {
+    src: '/images/black-love/after-dark.jpg',
+    alt: 'A Black couple posing together in black tank tops against a dark backdrop',
+    tag: 'Culture fit: perfect',
+    credit: { name: 'MONIQUE BEN', url: 'https://unsplash.com/photos/gW_uUms6Rrw' },
+    className: 'lg:col-span-3 lg:row-span-2 [&_img]:object-top',
+  },
+  {
+    src: '/images/black-love/hands-on-heart.jpg',
+    alt: 'A woman’s hands, wearing an engagement ring, resting on the chest of a Black man in a tuxedo',
+    tag: 'Tenure: for life',
+    credit: { name: 'Clay Banks', url: 'https://unsplash.com/photos/_3Sud4WPPYE' },
+    className: 'lg:col-span-3 lg:row-span-2',
+  },
+  {
+    src: '/images/black-love/close-embrace.jpg',
+    alt: 'A Black couple holding each other close, about to kiss',
+    tag: 'Mutual offer accepted',
+    credit: { name: 'One zone Studio', url: 'https://unsplash.com/photos/9B4hD5joEk4' },
+    className: 'col-span-2 lg:col-span-4 lg:row-span-2',
+  },
+]
+
 const ghostDark =
   'btn border border-cream/20 text-cream hover:border-gold hover:text-gold-bright focus-visible:outline-2 focus-visible:outline-gold'
 
@@ -58,6 +96,7 @@ function Landing() {
       <main className="relative z-[2]">
         <Hero />
         <Marquee />
+        <OnTheRecord />
         <HowItWorks />
         <Lounge />
         <Example />
@@ -149,6 +188,62 @@ function Marquee() {
           ))}
         </div>
       </div>
+    </section>
+  )
+}
+
+function OnTheRecord() {
+  return (
+    <section className="mx-auto max-w-6xl px-6 pt-28" aria-labelledby="on-the-record">
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+        <div>
+          <p className="label text-gold">Proof of concept</p>
+          <h2 id="on-the-record" className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl">
+            Black love, <em className="gold-foil">on the record.</em>
+          </h2>
+        </div>
+        <p className="max-w-md text-smoke lg:justify-self-end">
+          Tender, joyful, and built to last. Here’s to the partnerships with a track record worth putting on paper,
+          and to yours being next.
+        </p>
+      </div>
+
+      <div className="mt-14 grid auto-rows-[170px] grid-cols-2 gap-4 sm:auto-rows-[220px] lg:auto-rows-[150px] lg:grid-cols-12 lg:gap-5">
+        {PHOTOS.map(({ src, alt, tag, className }) => (
+          <figure
+            key={src}
+            className={`group relative overflow-hidden rounded-2xl border border-ember bg-velvet ${className}`}
+          >
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover transition duration-700 motion-safe:group-hover:scale-[1.04]"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent"
+              aria-hidden
+            />
+            <figcaption className="label absolute bottom-3 left-3 rounded-full border border-gold/30 bg-night/70 px-3 py-1.5 text-gold-bright backdrop-blur sm:bottom-4 sm:left-4">
+              {tag}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <p className="mt-5 text-xs text-smoke/70">
+        Photos by{' '}
+        {PHOTOS.map(({ credit }, i) => (
+          <span key={credit.url}>
+            <a href={credit.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-gold-bright hover:underline">
+              {credit.name}
+            </a>
+            {i < PHOTOS.length - 2 ? ', ' : i === PHOTOS.length - 2 ? ' and ' : ''}
+          </span>
+        ))}{' '}
+        on Unsplash.
+      </p>
     </section>
   )
 }
