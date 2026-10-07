@@ -82,7 +82,7 @@ function AccountPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-16">
+      <main className="mx-auto max-w-3xl px-6 py-16 lg:py-20">
         <p className="label text-rose">Personnel file</p>
         <h1 className="mt-3 font-display text-4xl font-medium tracking-tight">Your account</h1>
         <p className="mt-3 text-ink-soft">

@@ -82,7 +82,7 @@ function ResumePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-5xl px-4 sm:px-6">
+      <main className="mx-auto max-w-page px-4 sm:px-6">
         {published ? (
           <div className="no-print mb-8 rounded-lg border border-rose/25 bg-blush/50 p-5 sm:p-6">
             <p className="font-display text-2xl">Your resume is live. 💌</p>

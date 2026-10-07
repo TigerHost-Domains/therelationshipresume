@@ -65,12 +65,12 @@ function CreatePage() {
   return (
     <>
       <SiteHeader />
-      <div className="mx-auto max-w-[1400px] px-4 pt-6 pb-8 sm:px-6">
+      <div className="mx-auto max-w-studio px-4 pt-6 pb-8 sm:px-6 lg:px-10 lg:pt-8 lg:pb-10">
         <p className="label text-rose">New application</p>
-        <h1 className="mt-2 font-display text-4xl font-medium tracking-tight sm:text-5xl">
+        <h1 className="mt-2 font-display text-4xl font-medium tracking-tight sm:text-5xl xl:text-6xl">
           Write your <em>Relationship Resume</em>
         </h1>
-        <p className="mt-3 max-w-xl text-ink-soft">
+        <p className="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">
           Fill in as much or as little as you like — your page updates as you type. When you publish, you get a link
           to share on your dating profile, in your bio, or with a friend who loves to set people up.
         </p>

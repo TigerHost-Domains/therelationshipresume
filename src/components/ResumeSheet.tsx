@@ -39,19 +39,19 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
   return (
     <article
       style={{ '--accent': accent } as CSSProperties}
-      className={`sheet relative overflow-hidden rounded-sm ${compact ? 'p-7 sm:p-9' : 'p-8 sm:p-12 lg:p-14'}`}
+      className={`sheet @container relative overflow-hidden rounded-sm ${compact ? 'p-7 sm:p-9' : 'p-8 sm:p-12 lg:p-14 xl:p-16'}`}
     >
       <div className="absolute inset-x-0 top-0 h-1.5 bg-[var(--accent)]" />
 
       <header className="border-b border-ink/10 pb-7">
         <p className="label text-ink-soft">Relationship Resume</p>
         <h1
-          className={`mt-3 font-display font-semibold leading-[0.95] tracking-tight ${compact ? 'text-4xl' : 'text-5xl sm:text-6xl'}`}
+          className={`mt-3 font-display font-semibold leading-[0.95] tracking-tight ${compact ? 'text-4xl @3xl:text-5xl' : 'text-5xl sm:text-6xl xl:text-7xl'}`}
         >
           {resume.name || <span className="text-ink/25">Your Name</span>}
         </h1>
         {resume.headline ? (
-          <p className="mt-3 max-w-2xl font-display text-lg italic leading-snug text-ink-soft sm:text-xl">
+          <p className="mt-3 max-w-[40rem] font-display text-lg italic leading-snug text-ink-soft sm:text-xl">
             {resume.headline}
           </p>
         ) : null}
@@ -73,11 +73,11 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
         ) : null}
       </header>
 
-      <div className={`grid gap-10 pt-8 ${compact ? '' : 'md:grid-cols-[1.55fr_1fr]'}`}>
+      <div className="grid gap-10 pt-8 @2xl:grid-cols-[1.55fr_1fr] @4xl:gap-14">
         <div className="space-y-9">
           <Section title="Objective">
             {resume.objective ? (
-              <p className="font-display text-[1.08rem] leading-relaxed">{resume.objective}</p>
+              <p className="max-w-[38rem] font-display text-[1.1rem] leading-[1.65]">{resume.objective}</p>
             ) : (
               <Placeholder>What are you hoping to find?</Placeholder>
             )}
@@ -85,7 +85,7 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
 
           {resume.lookingFor ? (
             <Section title="Ideal Candidate">
-              <p className="leading-relaxed text-ink/85">{resume.lookingFor}</p>
+              <p className="max-w-[38rem] leading-relaxed text-ink/85">{resume.lookingFor}</p>
             </Section>
           ) : null}
 
@@ -96,7 +96,7 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
                   <div key={i}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4">
                       <h4 className="font-display text-lg font-semibold">{job.role}</h4>
-                      {job.years ? <span className="font-mono text-xs text-ink-soft">{job.years}</span> : null}
+                      {job.years ? <span className="font-mono text-xs tabular-nums text-ink-soft">{job.years}</span> : null}
                     </div>
                     {job.place ? <p className="text-sm italic text-ink-soft">{job.place}</p> : null}
                     {job.description ? (
@@ -112,7 +112,7 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
 
           {resume.references.length > 0 ? (
             <Section title="References">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-x-6 gap-y-5 @lg:grid-cols-2">
                 {resume.references.map((ref, i) => (
                   <figure key={i} className="border-l-2 border-[var(--accent)]/40 pl-4">
                     <blockquote className="font-display text-[0.98rem] italic leading-snug">“{ref.quote}”</blockquote>
@@ -127,7 +127,7 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
           ) : null}
         </div>
 
-        <aside className={`space-y-8 ${compact ? '' : 'md:border-l md:border-ink/10 md:pl-8'}`}>
+        <aside className="space-y-8 @2xl:border-l @2xl:border-ink/10 @2xl:pl-8 @4xl:pl-12">
           <Section title="Core Qualities">
             {resume.qualities.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
