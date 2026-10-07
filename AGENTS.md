@@ -26,7 +26,7 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 | `src/routes/r/$slug/edit.tsx` | Edit (owner, co-editors, proxy roles) + owner's co-editor panel; `?key=` only claims legacy resumes |
 | `src/routes/login.tsx` | Sign in / sign up / password reset / invite acceptance (`?redirect=` returns the member afterwards) |
 | `src/lib/auth.ts`, `src/middleware/identity.ts`, `src/lib/identity-context.tsx` | Netlify Identity (`@netlify/identity`): server user lookup, `requireAuthMiddleware`, client auth state |
-| `src/routes/account.tsx`, `src/server/mfa.ts`, `src/server/mfa.functions.ts` | Optional authenticator-app (TOTP) two-factor: setup/disable page, code checks, 2FA browser sessions |
+| `src/routes/account.tsx`, `src/server/mfa.ts`, `src/server/mfa.functions.ts` | Account page: the member's resume links (`listMyResumes`, owned + co-edited) and optional authenticator-app (TOTP) two-factor setup/disable, code checks, 2FA browser sessions |
 
 ## Non-obvious decisions
 
