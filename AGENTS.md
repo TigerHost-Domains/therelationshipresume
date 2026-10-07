@@ -21,13 +21,13 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 | `src/components/SiteHeader.tsx` | Header, footer, monogram |
 | `src/lib/edit-keys.ts` | localStorage map of slug → edit key |
 | `src/routes/index.tsx` | Landing page |
-| `src/routes/create.tsx` | New resume |
+| `src/routes/create.tsx`, `src/lib/drafts.ts` | New resume; two autosaved localStorage draft slots (`?draft=1\|2`) |
 | `src/routes/r/$slug/index.tsx` | Public resume (`?published=true` shows share/edit links after publishing) |
 | `src/routes/r/$slug/edit.tsx` | Edit (owner, co-editors, proxy roles) + owner's co-editor panel; `?key=` only claims legacy resumes |
 | `src/routes/login.tsx` | Sign in / sign up / password reset / invite acceptance (`?redirect=` returns the member afterwards) |
 | `src/lib/auth.ts`, `src/middleware/identity.ts`, `src/lib/identity-context.tsx` | Netlify Identity (`@netlify/identity`): server user lookup, `requireAuthMiddleware`, client auth state |
 | `src/routes/account.tsx`, `src/server/mfa.ts`, `src/server/mfa.functions.ts` | Account page: the member's resume links (`listMyResumes`, owned + co-edited) and optional authenticator-app (TOTP) two-factor setup/disable, code checks, 2FA browser sessions |
-| `src/components/SocialMatchConnect.tsx`, `src/server/social-match.ts`, `src/lib/social-match.ts` | "Add to Social Match" button/dialog on the public resume page and the server-side client that pins the resume to the member's Social Match Game profile |
+| `src/components/SocialMatchConnect.tsx`, `src/server/social-match.ts`, `src/lib/social-match.ts` | "Add to Social Match" button/dialog on the public resume page (and, compact, on each account-page resume row) and the server-side client that pins the resume to the member's Social Match Game profile |
 
 ## Non-obvious decisions
 
@@ -44,7 +44,7 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 - **Two-factor is ours, not Identity's.** `member_mfa` holds each member's TOTP secret; passing a code sets an httpOnly
   `rr_mfa` cookie backed by a hashed row in `mfa_sessions` (12h). `requireAuthMiddleware` enforces it for publishing
   and editing (`MFA_REQUIRED` error → `/login?mode=mfa`); `requireSignInMiddleware` skips it for the 2FA endpoints.
-- Identity only works on deployed Netlify sites, not localhost. `/create` keeps an unsigned-in draft in localStorage.
+- Identity only works on deployed Netlify sites, not localhost. `/create` autosaves up to two drafts in localStorage (signed in or not); publishing clears that slot.
 - Slugs are `<name-slug>-<6 random chars>` so they're friendly but not guessable/enumerable.
 - Design system: Fraunces (display), Instrument Sans (body), IBM Plex Mono (labels), loaded from Google Fonts in
   `__root.tsx`. Colour tokens (`paper`, `sheet`, `ink`, `rose`, `blush`, `rule`) are in `src/styles.css` `@theme`;
