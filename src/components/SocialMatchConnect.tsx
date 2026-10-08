@@ -105,7 +105,7 @@ function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo
           <>
             <h2 className="mt-2 font-display text-3xl">Send to The Social Match Game</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              We'll hand your resume and your verified name, age and sex to The Social Match Game, then send you over to finish the paperwork:
+              We'll hand your resume and your verified name, date of birth and sex to The Social Match Game, then send you over to finish the paperwork:
             </p>
             <ol className="mt-3 grid list-decimal gap-1 pl-5 text-sm text-ink-soft">
               <li>Sign in there with the same Google or GitHub account you use here — they check it matches.</li>

@@ -10,13 +10,14 @@ export type SocialMatchInvite = { joinUrl: string; expiresAt?: string }
 
 /**
  * The verified identity behind the resume, sent with the invite so The Social Match Game can build the profile from
- * it and refuse the claim unless the Google/GitHub account signing in there has the same provider and email. Age is
- * sent rather than the date of birth.
+ * it and refuse the claim unless the Google/GitHub account signing in there has the same provider and email. Their
+ * API requires the sworn date of birth (they run their own age check from it), not just the age.
  */
 export type SocialMatchMember = {
   provider: SocialProvider
   email: string | null
   name: string
+  dateOfBirth: string
   age: number
   over21: true
   sex: Sex
@@ -41,7 +42,17 @@ export async function createSocialMatchInvite(slug: string, member: SocialMatchM
     res = await fetch(`${SOCIAL_MATCH_API}/api/integrations/relationship-resume/invites`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-integration-secret': secret },
-      body: JSON.stringify({ slug, member }),
+      // They validate name, dateOfBirth and sex at the top level of the body (a 400 "Name, date of birth and sex are
+      // required." otherwise); `member` carries the full record for the provider/email match.
+      body: JSON.stringify({
+        slug,
+        name: member.name,
+        dateOfBirth: member.dateOfBirth,
+        sex: member.sex,
+        email: member.email,
+        provider: member.provider,
+        member,
+      }),
       // Their backend naps when idle and can take most of a minute to wake; the dialog nudges it on open.
       signal: AbortSignal.timeout(45_000),
     })
