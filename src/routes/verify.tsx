@@ -31,7 +31,7 @@ export const Route = createFileRoute('/verify')({
     if (user.mfaPending) throw redirect({ to: '/login', search: { mode: 'mfa', redirect: location.href } })
   },
   loader: () => getMyIdentity(),
-  head: () => ({ meta: [{ title: 'Identity check · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
+  head: () => ({ meta: [{ title: 'Identity Check · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
   component: VerifyPage,
 })
 
@@ -76,7 +76,7 @@ function VerifyPage() {
 
   if (identity.status === 'refused') {
     return (
-      <Shell eyebrow="Application on hold" title="Come back when you’re 18.">
+      <Shell eyebrow="Application on Hold" title="Come Back When You’re 18.">
         <p className="mt-3 text-ink-soft">
           Relationship Resumes are for adults, {MIN_AGE_RESUME} and over. We haven’t kept your date of birth or any
           other details — just a note that this account can’t apply.
@@ -86,7 +86,7 @@ function VerifyPage() {
           className="btn-ghost mt-8"
           onClick={() => void logout().then(() => window.location.assign('/'))}
         >
-          Sign out
+          Sign Out
         </button>
       </Shell>
     )
@@ -94,7 +94,7 @@ function VerifyPage() {
 
   if (identity.status === 'verified') {
     return (
-      <Shell eyebrow="Background check complete" title="You’re on file.">
+      <Shell eyebrow="Background Check Complete" title="You’re on File.">
         <OnFile identity={identity} />
         <a href={next} className="btn-primary mt-8">
           Continue
@@ -104,7 +104,7 @@ function VerifyPage() {
   }
 
   return (
-    <Shell eyebrow="Background check" title="Who’s applying?">
+    <Shell eyebrow="Background Check" title="Who’s Applying?">
       <p className="mt-3 text-ink-soft">
         Name, age and sex appear on every resume and keep the community safe, so we take them once and lock them.
         What you say you are is who you are.
@@ -112,7 +112,7 @@ function VerifyPage() {
 
       <form onSubmit={onSubmit} className="sheet mt-8 space-y-5 rounded-lg p-6">
         <label className="block">
-          <span className="label text-ink-soft">Full legal name</span>
+          <span className="label text-ink-soft">Full Legal Name</span>
           {nameLocked ? (
             <>
               <span className="field mt-1.5 flex items-center gap-2 bg-blush/30">
@@ -140,7 +140,7 @@ function VerifyPage() {
         </label>
 
         <label className="block">
-          <span className="label text-ink-soft">Date of birth</span>
+          <span className="label text-ink-soft">Date of Birth</span>
           <input
             className="field mt-1.5"
             type="date"
@@ -187,7 +187,7 @@ function VerifyPage() {
             giving false details may get my resumes removed and my account closed. I understand they can’t be
             changed later except by contacting The Relationship Resume.
             <span className="mt-1 block font-mono text-[0.7rem] text-ink-soft">
-              Truthful identity policy · v{IDENTITY_POLICY_VERSION}
+              Truthful Identity Policy · v{IDENTITY_POLICY_VERSION}
             </span>
           </span>
         </label>
@@ -198,7 +198,7 @@ function VerifyPage() {
           </p>
         ) : null}
         <button type="submit" className="btn-primary w-full" disabled={pending}>
-          {pending ? 'Filing your paperwork…' : 'Swear me in'}
+          {pending ? 'Filing Your Paperwork…' : 'Swear Me In'}
         </button>
       </form>
     </Shell>
@@ -215,7 +215,7 @@ function Shell({ eyebrow, title, children }: { eyebrow: string; title: string; c
         {children}
         <p className="mt-8 text-sm text-ink-soft">
           <Link to="/" className="underline hover:text-ink">
-            Back to the homepage
+            Back to the Homepage
           </Link>
         </p>
       </main>

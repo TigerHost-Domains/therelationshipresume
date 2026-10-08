@@ -23,7 +23,7 @@ import { createResume } from '@/server/resumes.functions'
 
 export const Route = createFileRoute('/create')({
   validateSearch: z.object({ draft: z.union([z.literal(1), z.literal(2)]).optional().catch(undefined) }),
-  head: () => ({ meta: [{ title: 'Write your Relationship Resume' }] }),
+  head: () => ({ meta: [{ title: 'Write Your Relationship Resume' }] }),
   component: CreatePage,
 })
 
@@ -83,9 +83,9 @@ function CreatePage() {
     <>
       <SiteHeader />
       <div className="mx-auto max-w-studio px-4 pt-6 pb-8 sm:px-6 lg:px-10 lg:pt-8 lg:pb-10">
-        <p className="label text-rose">New application</p>
+        <p className="label text-rose">New Application</p>
         <h1 className="mt-2 font-display text-4xl font-medium tracking-tight sm:text-5xl xl:text-6xl">
-          Write your <em>Relationship Resume</em>
+          Write Your <em>Relationship Resume</em>
         </h1>
         <p className="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">
           Fill in as much or as little as you like — your page updates as you type. When you publish, you get a link
@@ -102,7 +102,7 @@ function CreatePage() {
         ) : null}
 
         <div className="no-print mt-6">
-          <p className="label text-ink-soft">Drafts in progress · saved in this browser, two at a time</p>
+          <p className="label text-ink-soft">Drafts in Progress · Saved in This Browser, Two at a Time</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {DRAFT_SLOTS.map((s) => {
               const draft = drafts[s]
@@ -123,7 +123,7 @@ function CreatePage() {
                   >
                     {draft ? null : <FilePlus2 className="size-4 text-ink-soft" />}
                     <span className={draft ? 'font-medium' : 'text-ink-soft'}>
-                      {draft ? draft.name || 'Untitled draft' : `Start draft ${s}`}
+                      {draft ? draft.name || 'Untitled Draft' : `Start Draft ${s}`}
                     </span>
                     {draft ? <span className="text-xs text-ink-soft">{savedAgo(draft.updatedAt)}</span> : null}
                   </Link>
@@ -156,13 +156,13 @@ function CreatePage() {
               One quick background check before you publish: your name comes from your sign-in account, and you
               swear to your date of birth and sex once.{' '}
               <Link to="/verify" search={{ redirect: `/create?draft=${slot}` }} className="text-rose underline">
-                Complete your identity check
+                Complete Your Identity Check
               </Link>
             </>
           ) : undefined
         }
         submitLabel={
-          !signedIn ? 'Sign in to publish' : me?.status === 'missing' ? 'Verify & publish' : 'Publish my resume'
+          !signedIn ? 'Sign In to Publish' : me?.status === 'missing' ? 'Verify & Publish' : 'Publish My Resume'
         }
         onChange={autosave}
         onSubmit={async (resume) => {

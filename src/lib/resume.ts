@@ -1,8 +1,26 @@
 import { z } from 'zod'
 import { NAME_STYLES, type Sex, type SocialProvider } from '@/lib/member'
 
+/**
+ * Character and item limits, shared by the schema and the builder's counters so they always agree. Long-form answers
+ * share one limit, as do the list items under Qualities & Preferences.
+ */
+export const LIMITS = {
+  location: 80,
+  headline: 120,
+  contact: 160,
+  /** Objective and Ideal Candidate. */
+  paragraph: 600,
+  /** How many entries each Qualities & Preferences list holds. */
+  listItems: 16,
+  /** Characters per Qualities & Preferences entry. */
+  listItem: 80,
+  /** Experience descriptions and reference quotes. */
+  blurb: 300,
+} as const
+
 const shortText = (max: number) => z.string().trim().max(max)
-const list = (max: number, itemMax = 80) =>
+const list = (max: number = LIMITS.listItems, itemMax: number = LIMITS.listItem) =>
   z.array(z.string().trim().min(1).max(itemMax)).max(max)
 
 export const resumeInputSchema = z.object({
@@ -10,14 +28,14 @@ export const resumeInputSchema = z.object({
   name: shortText(60),
   age: shortText(10),
   nameStyle: z.enum(NAME_STYLES).catch('first-initial'),
-  location: shortText(80),
-  headline: shortText(120),
-  objective: shortText(600),
-  lookingFor: shortText(400),
-  qualities: list(12),
-  likes: list(16),
-  dislikes: list(16),
-  dealbreakers: list(10),
+  location: shortText(LIMITS.location),
+  headline: shortText(LIMITS.headline),
+  objective: shortText(LIMITS.paragraph),
+  lookingFor: shortText(LIMITS.paragraph),
+  qualities: list(),
+  likes: list(),
+  dislikes: list(),
+  dealbreakers: list(),
   loveLanguages: list(5, 40),
   experience: z
     .array(
@@ -25,7 +43,7 @@ export const resumeInputSchema = z.object({
         role: shortText(80).min(1),
         place: shortText(80),
         years: shortText(30),
-        description: shortText(300),
+        description: shortText(LIMITS.blurb),
       }),
     )
     .max(6),
@@ -34,11 +52,11 @@ export const resumeInputSchema = z.object({
       z.object({
         name: shortText(60).min(1),
         relation: shortText(60),
-        quote: shortText(300).min(1),
+        quote: shortText(LIMITS.blurb).min(1),
       }),
     )
     .max(4),
-  contact: shortText(160),
+  contact: shortText(LIMITS.contact),
   accent: z.enum(['rose', 'ink', 'sage', 'marigold']),
 })
 

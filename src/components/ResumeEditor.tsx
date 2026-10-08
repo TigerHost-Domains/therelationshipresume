@@ -4,6 +4,7 @@ import { ResumeSheet } from '@/components/ResumeSheet'
 import { displayName, NAME_STYLES, PROVIDER_LABELS, SEXES, type ResumeIdentity } from '@/lib/member'
 import {
   ACCENTS,
+  LIMITS,
   LOVE_LANGUAGES,
   resumeInputSchema,
   sampleResume,
@@ -39,24 +40,33 @@ function Field({ label, children, note }: { label: string; children: ReactNode; 
   )
 }
 
+/** The character count shown under a text box that has no label row of its own. */
+function Count({ value, max }: { value: string; max: number }) {
+  return (
+    <p className="-mt-2 text-right text-xs text-ink-soft/70">
+      {value.length}/{max}
+    </p>
+  )
+}
+
 function TagInput({
   label,
   values,
   onChange,
   placeholder,
   suggestions = [],
-  max,
+  max = LIMITS.listItems,
 }: {
   label: string
   values: string[]
   onChange: (next: string[]) => void
   placeholder: string
   suggestions?: string[]
-  max: number
+  max?: number
 }) {
   const [draft, setDraft] = useState('')
   const add = (value: string) => {
-    const v = value.trim().slice(0, 80)
+    const v = value.trim().slice(0, LIMITS.listItem)
     if (!v || values.length >= max || values.some((x) => x.toLowerCase() === v.toLowerCase())) return
     onChange([...values, v])
   }
@@ -76,7 +86,8 @@ function TagInput({
       <div className="flex items-baseline justify-between">
         <span className="label text-ink-soft">{label}</span>
         <span className="text-xs text-ink-soft/70">
-          {values.length}/{max}
+          {draft ? `${draft.length}/${LIMITS.listItem} · ` : ''}
+          {values.length}/{max} Items
         </span>
       </div>
       <div className="field flex min-h-11 flex-wrap items-center gap-1.5 py-1.5">
@@ -101,6 +112,7 @@ function TagInput({
             add(draft)
             setDraft('')
           }}
+          maxLength={LIMITS.listItem}
           placeholder={values.length ? 'Add another…' : placeholder}
           disabled={values.length >= max}
           className="min-w-[8rem] flex-1 bg-transparent py-1 text-[0.95rem] outline-none placeholder:text-ink-soft/50"
@@ -220,7 +232,7 @@ export function ResumeEditor({
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:gap-14 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] 2xl:gap-20">
         <form onSubmit={submit} className={`space-y-8 pb-16 xl:space-y-10 ${mobileView === 'preview' ? 'hidden lg:block' : ''}`}>
-          <Step n="01" title="The basics" hint="How you'd introduce yourself at the top of the page.">
+          <Step n="01" title="The Basics" hint="How you'd introduce yourself at the top of the page.">
             {identity ? (
               <div className="space-y-3 rounded-lg border border-rule bg-sheet/60 p-4">
                 <p className="flex items-center gap-2 text-sm text-ink-soft">
@@ -228,7 +240,7 @@ export function ResumeEditor({
                   Identity on file · name from {PROVIDER_LABELS[identity.provider]}, age and sex as sworn. Locked.
                 </p>
                 <div className="space-y-2">
-                  <span className="label text-ink-soft">Show my name as</span>
+                  <span className="label text-ink-soft">Show My Name As</span>
                   <div className="flex flex-wrap gap-2">
                     {NAME_STYLES.map((style) => (
                       <button
@@ -255,33 +267,33 @@ export function ResumeEditor({
                   'Your name, age and sex are filled in from your verified identity — no typing, no fibbing.'}
               </div>
             )}
-            <Field label="Location">
-              <input className="field" value={resume.location} maxLength={80} onChange={(e) => set('location', e.target.value)} placeholder="City, State" />
+            <Field label="Location" note={`${resume.location.length}/${LIMITS.location}`}>
+              <input className="field" value={resume.location} maxLength={LIMITS.location} onChange={(e) => set('location', e.target.value)} placeholder="City, State" />
             </Field>
-            <Field label="Headline" note={`${resume.headline.length}/120`}>
-              <input className="field" value={resume.headline} maxLength={120} onChange={(e) => set('headline', e.target.value)} placeholder="Weekend hiker, weeknight cook, lifelong romantic" />
+            <Field label="Headline" note={`${resume.headline.length}/${LIMITS.headline}`}>
+              <input className="field" value={resume.headline} maxLength={LIMITS.headline} onChange={(e) => set('headline', e.target.value)} placeholder="Weekend hiker, weeknight cook, lifelong romantic" />
             </Field>
-            <Field label="How to reach you" note="Shown publicly">
-              <input className="field" value={resume.contact} maxLength={160} onChange={(e) => set('contact', e.target.value)} placeholder="Email, Instagram handle, or dating-app username" />
+            <Field label="How to Reach You" note={`Shown Publicly · ${resume.contact.length}/${LIMITS.contact}`}>
+              <input className="field" value={resume.contact} maxLength={LIMITS.contact} onChange={(e) => set('contact', e.target.value)} placeholder="Email, Instagram handle, or dating-app username" />
             </Field>
           </Step>
 
           <Step n="02" title="Objective" hint="The one-paragraph pitch. What are you looking for in love?">
-            <Field label="Objective" note={`${resume.objective.length}/600`}>
-              <textarea className="field min-h-28" value={resume.objective} maxLength={600} onChange={(e) => set('objective', e.target.value)} placeholder="To find a partner who…" />
+            <Field label="Objective" note={`${resume.objective.length}/${LIMITS.paragraph}`}>
+              <textarea className="field min-h-28" value={resume.objective} maxLength={LIMITS.paragraph} onChange={(e) => set('objective', e.target.value)} placeholder="To find a partner who…" />
             </Field>
-            <Field label="Ideal candidate" note={`${resume.lookingFor.length}/400`}>
-              <textarea className="field min-h-24" value={resume.lookingFor} maxLength={400} onChange={(e) => set('lookingFor', e.target.value)} placeholder="Describe the person you'd love to meet." />
+            <Field label="Ideal Candidate" note={`${resume.lookingFor.length}/${LIMITS.paragraph}`}>
+              <textarea className="field min-h-28" value={resume.lookingFor} maxLength={LIMITS.paragraph} onChange={(e) => set('lookingFor', e.target.value)} placeholder="Describe the person you'd love to meet." />
             </Field>
           </Step>
 
-          <Step n="03" title="Qualities & preferences" hint="Press Enter after each one, or tap a suggestion.">
-            <TagInput label="Core qualities" values={resume.qualities} onChange={(v) => set('qualities', v)} placeholder="What makes you a great partner?" suggestions={SUGGESTIONS.qualities} max={12} />
-            <TagInput label="Likes" values={resume.likes} onChange={(v) => set('likes', v)} placeholder="Things you love" suggestions={SUGGESTIONS.likes} max={16} />
-            <TagInput label="Dislikes" values={resume.dislikes} onChange={(v) => set('dislikes', v)} placeholder="Pet peeves" suggestions={SUGGESTIONS.dislikes} max={16} />
-            <TagInput label="Dealbreakers" values={resume.dealbreakers} onChange={(v) => set('dealbreakers', v)} placeholder="Non-negotiables" suggestions={SUGGESTIONS.dealbreakers} max={10} />
+          <Step n="03" title="Qualities & Preferences" hint="Press Enter after each one, or tap a suggestion.">
+            <TagInput label="Core Qualities" values={resume.qualities} onChange={(v) => set('qualities', v)} placeholder="What makes you a great partner?" suggestions={SUGGESTIONS.qualities} />
+            <TagInput label="Likes" values={resume.likes} onChange={(v) => set('likes', v)} placeholder="Things you love" suggestions={SUGGESTIONS.likes} />
+            <TagInput label="Dislikes" values={resume.dislikes} onChange={(v) => set('dislikes', v)} placeholder="Pet peeves" suggestions={SUGGESTIONS.dislikes} />
+            <TagInput label="Dealbreakers" values={resume.dealbreakers} onChange={(v) => set('dealbreakers', v)} placeholder="Non-negotiables" suggestions={SUGGESTIONS.dealbreakers} />
             <div className="space-y-2">
-              <span className="label text-ink-soft">Love languages · tap in order of importance</span>
+              <span className="label text-ink-soft">Love Languages · Tap in Order of Importance</span>
               <div className="flex flex-wrap gap-2">
                 {LOVE_LANGUAGES.map((lang) => {
                   const idx = resume.loveLanguages.indexOf(lang)
@@ -303,7 +315,7 @@ export function ResumeEditor({
             </div>
           </Step>
 
-          <Step n="04" title="Relevant experience" hint="Past relationships, lessons learned, or anything that proves you're ready.">
+          <Step n="04" title="Relevant Experience" hint="Past relationships, lessons learned, or anything that proves you're ready.">
             {resume.experience.map((job, i) => (
               <div key={i} className="relative space-y-3 rounded-lg border border-rule bg-sheet/60 p-4">
                 <button
@@ -322,13 +334,14 @@ export function ResumeEditor({
                 </div>
                 <input className="field" placeholder="Where / with whom" value={job.place} maxLength={80}
                   onChange={(e) => set('experience', resume.experience.map((x, j) => (j === i ? { ...x, place: e.target.value } : x)))} />
-                <textarea className="field min-h-20" placeholder="What you learned or brought to the table" value={job.description} maxLength={300}
+                <textarea className="field min-h-20" placeholder="What you learned or brought to the table" value={job.description} maxLength={LIMITS.blurb}
                   onChange={(e) => set('experience', resume.experience.map((x, j) => (j === i ? { ...x, description: e.target.value } : x)))} />
+                <Count value={job.description} max={LIMITS.blurb} />
               </div>
             ))}
             {resume.experience.length < 6 ? (
               <button type="button" className="btn-ghost" onClick={() => set('experience', [...resume.experience, { role: '', place: '', years: '', description: '' }])}>
-                <Plus className="size-4" /> Add experience
+                <Plus className="size-4" /> Add Experience
               </button>
             ) : null}
           </Step>
@@ -350,18 +363,19 @@ export function ResumeEditor({
                   <input className="field" placeholder="Relationship (e.g. College roommate)" value={ref.relation} maxLength={60}
                     onChange={(e) => set('references', resume.references.map((x, j) => (j === i ? { ...x, relation: e.target.value } : x)))} />
                 </div>
-                <textarea className="field min-h-20" placeholder="What would they say about you?" value={ref.quote} maxLength={300}
+                <textarea className="field min-h-20" placeholder="What would they say about you?" value={ref.quote} maxLength={LIMITS.blurb}
                   onChange={(e) => set('references', resume.references.map((x, j) => (j === i ? { ...x, quote: e.target.value } : x)))} />
+                <Count value={ref.quote} max={LIMITS.blurb} />
               </div>
             ))}
             {resume.references.length < 4 ? (
               <button type="button" className="btn-ghost" onClick={() => set('references', [...resume.references, { name: '', relation: '', quote: '' }])}>
-                <Plus className="size-4" /> Add reference
+                <Plus className="size-4" /> Add Reference
               </button>
             ) : null}
           </Step>
 
-          <Step n="06" title="Finishing touch" hint="Pick the ink for your page.">
+          <Step n="06" title="Finishing Touch" hint="Pick the ink for your page.">
             <div className="flex flex-wrap gap-3">
               {Object.entries(ACCENTS).map(([key, { label, color }]) => (
                 <button
@@ -384,7 +398,7 @@ export function ResumeEditor({
               <p className="text-sm text-rose" role="alert">{error}</p>
             ) : (
               <button type="button" onClick={() => setResume({ ...sampleResume, nameStyle: resume.nameStyle })} className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-rose">
-                <Sparkles className="size-4" /> Fill with an example
+                <Sparkles className="size-4" /> Fill with an Example
               </button>
             )}
             <button type="submit" className="btn-primary" disabled={saving || disabled}>
@@ -395,7 +409,7 @@ export function ResumeEditor({
 
         <div className={`${mobileView === 'edit' ? 'hidden lg:block' : ''}`}>
           <div className="lg:sticky lg:top-6">
-            <p className="label no-print mb-3 hidden text-ink-soft lg:block">Live preview</p>
+            <p className="label no-print mb-3 hidden text-ink-soft lg:block">Live Preview</p>
             <div className="lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:rounded-sm">
               <ResumeSheet
                 resume={{ ...effective, sex: identity?.sex ?? null, verifiedVia: identity?.provider ?? null }}

@@ -80,3 +80,7 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 
 - `@/` alias → `src/`. Strict TypeScript. Server functions use `.inputValidator(...)` with Zod schemas.
 - Match the editorial tone in copy: resume/hiring puns, warm and witty, never cheesy.
+- UI chrome (headings, buttons, links, nav, field labels, eyebrows, page titles) is Title Case (Chicago: lowercase
+  a/an/the, short conjunctions and prepositions unless first/last). Body copy, hints, placeholders, errors and
+  user-data strings (`LOVE_LANGUAGES`, suggestions, sample resume) stay sentence case.
+- Resume field limits live in `LIMITS` (`src/lib/resume.ts`); the schema and the builder's counters both read it.

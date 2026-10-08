@@ -34,7 +34,7 @@ export function SiteHeader({ tone = 'light' }: { tone?: Tone }) {
       </Link>
       <nav className="flex items-center gap-1 sm:gap-2">
         <Link to="/" hash="example" className={`hidden sm:inline ${navLink}`}>
-          See an example
+          See an Example
         </Link>
         {ready &&
           (user ? (
@@ -48,16 +48,16 @@ export function SiteHeader({ tone = 'light' }: { tone?: Tone }) {
               className={`hidden sm:inline ${navLink}`}
               title={user.email}
             >
-              Sign out
+              Sign Out
             </button>
             </>
           ) : (
             <Link to="/login" className={navLink}>
-              Sign in
+              Sign In
             </Link>
           ))}
         <Link to="/create" className="btn-primary whitespace-nowrap px-4 sm:px-5">
-          Write yours
+          Write Yours
         </Link>
       </nav>
     </header>

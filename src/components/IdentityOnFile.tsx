@@ -10,8 +10,8 @@ export function IdentityOnFile({ identity }: { identity: Identity }) {
     ['Name', identity.legalName],
     ['Age', identity.age !== null ? String(identity.age) : null],
     ['Sex', identity.sex ? SEXES[identity.sex] : null],
-    ['Signed in with', PROVIDER_LABELS[identity.provider]],
-    ['Sworn on', identity.attestedAt ? new Date(identity.attestedAt).toLocaleDateString() : null],
+    ['Signed In With', PROVIDER_LABELS[identity.provider]],
+    ['Sworn On', identity.attestedAt ? new Date(identity.attestedAt).toLocaleDateString() : null],
   ] as const
   return (
     <div className="sheet mt-6 rounded-lg p-6">

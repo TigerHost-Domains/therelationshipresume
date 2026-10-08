@@ -90,10 +90,10 @@ function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo
           <X className="size-4" />
         </button>
 
-        <p className="label text-rose">Cross-posting</p>
+        <p className="label text-rose">Cross-Posting</p>
         {joinUrl ? (
           <>
-            <h2 className="mt-2 font-display text-3xl">Application forwarded.</h2>
+            <h2 className="mt-2 font-display text-3xl">Application Forwarded.</h2>
             <p className="mt-2 text-sm text-ink-soft">
               Taking you to The Social Match Game to finish the interview. If nothing happens, use the button below.
             </p>
@@ -119,7 +119,7 @@ function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo
             ) : null}
             <button type="button" className="btn-primary mt-6 w-full" onClick={send} disabled={busy}>
               {busy ? <Loader2 className="size-4 animate-spin" /> : <Heart className="size-4" />}
-              {busy ? 'Forwarding your application…' : 'Send my resume'}
+              {busy ? 'Forwarding Your Application…' : 'Send My Resume'}
             </button>
             {busy ? (
               <p className="mt-2 text-center text-xs text-ink-soft">
