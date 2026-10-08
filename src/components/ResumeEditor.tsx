@@ -1,6 +1,7 @@
 import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { Eye, PenLine, Plus, Sparkles, Trash2, X } from 'lucide-react'
+import { BadgeCheck, Eye, Lock, PenLine, Plus, Sparkles, Trash2, X } from 'lucide-react'
 import { ResumeSheet } from '@/components/ResumeSheet'
+import { displayName, NAME_STYLES, PROVIDER_LABELS, SEXES, type ResumeIdentity } from '@/lib/member'
 import {
   ACCENTS,
   LOVE_LANGUAGES,
@@ -135,9 +136,18 @@ export function ResumeEditor({
   submitLabel,
   onSubmit,
   onChange,
+  identity,
+  identityNote,
+  disabled,
 }: {
   initial: ResumeInput
   submitLabel: string
+  /** The verified person this resume is about. Name, age and sex always come from here, never from typing. */
+  identity: ResumeIdentity | null
+  /** Shown in place of the identity panel when there's no identity yet (signed out, or check not done). */
+  identityNote?: ReactNode
+  /** Blocks publishing (e.g. under-age members) while still allowing drafting. */
+  disabled?: boolean
   onSubmit: (resume: ResumeInput) => Promise<void>
   /** Called with the work in progress after every change (used to autosave drafts). */
   onChange?: (resume: ResumeInput) => void
@@ -147,10 +157,17 @@ export function ResumeEditor({
   const [error, setError] = useState<string | null>(null)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
 
+  // What the page actually says: the typed content plus the identity on file.
+  const effective: ResumeInput = {
+    ...resume,
+    name: identity ? displayName(identity.legalName, resume.nameStyle) : '',
+    age: identity ? String(identity.age) : '',
+  }
+
   useEffect(() => {
-    onChange?.(resume)
+    onChange?.(effective)
     // Only the content matters here; a new onChange identity on each parent render shouldn't re-save.
-  }, [resume])
+  }, [resume, identity])
 
   const set = <K extends keyof ResumeInput>(key: K, value: ResumeInput[K]) =>
     setResume((r) => ({ ...r, [key]: value }))
@@ -167,7 +184,7 @@ export function ResumeEditor({
     e.preventDefault()
     setError(null)
     const cleaned: ResumeInput = {
-      ...resume,
+      ...effective,
       experience: resume.experience.filter((x) => x.role.trim()),
       references: resume.references.filter((x) => x.name.trim() && x.quote.trim()),
     }
@@ -204,14 +221,40 @@ export function ResumeEditor({
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:gap-14 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] 2xl:gap-20">
         <form onSubmit={submit} className={`space-y-8 pb-16 xl:space-y-10 ${mobileView === 'preview' ? 'hidden lg:block' : ''}`}>
           <Step n="01" title="The basics" hint="How you'd introduce yourself at the top of the page.">
-            <div className="grid gap-4 sm:grid-cols-[1fr_6rem]">
-              <Field label="Name *">
-                <input className="field" value={resume.name} maxLength={60} onChange={(e) => set('name', e.target.value)} placeholder="First name, or first + last initial" required />
-              </Field>
-              <Field label="Age">
-                <input className="field" value={resume.age} maxLength={10} onChange={(e) => set('age', e.target.value)} placeholder="32" />
-              </Field>
-            </div>
+            {identity ? (
+              <div className="space-y-3 rounded-lg border border-rule bg-sheet/60 p-4">
+                <p className="flex items-center gap-2 text-sm text-ink-soft">
+                  <BadgeCheck className="size-4 text-rose" />
+                  Identity on file · name from {PROVIDER_LABELS[identity.provider]}, age and sex as sworn. Locked.
+                </p>
+                <div className="space-y-2">
+                  <span className="label text-ink-soft">Show my name as</span>
+                  <div className="flex flex-wrap gap-2">
+                    {NAME_STYLES.map((style) => (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => set('nameStyle', style)}
+                        className={`rounded-full border px-3.5 py-1.5 text-sm transition ${
+                          resume.nameStyle === style ? 'border-rose bg-rose text-white' : 'border-ink/15 hover:border-rose/60'
+                        }`}
+                      >
+                        {displayName(identity.legalName, style)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <p className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-ink-soft">
+                  <span className="inline-flex items-center gap-1"><Lock className="size-3" /> {identity.age} years</span>
+                  <span className="inline-flex items-center gap-1"><Lock className="size-3" /> {SEXES[identity.sex]}</span>
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-dashed border-rose/40 bg-blush/30 p-4 text-sm text-ink-soft">
+                {identityNote ??
+                  'Your name, age and sex are filled in from your verified identity — no typing, no fibbing.'}
+              </div>
+            )}
             <Field label="Location">
               <input className="field" value={resume.location} maxLength={80} onChange={(e) => set('location', e.target.value)} placeholder="City, State" />
             </Field>
@@ -340,11 +383,11 @@ export function ResumeEditor({
             {error ? (
               <p className="text-sm text-rose" role="alert">{error}</p>
             ) : (
-              <button type="button" onClick={() => setResume(sampleResume)} className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-rose">
+              <button type="button" onClick={() => setResume({ ...sampleResume, nameStyle: resume.nameStyle })} className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-rose">
                 <Sparkles className="size-4" /> Fill with an example
               </button>
             )}
-            <button type="submit" className="btn-primary" disabled={saving}>
+            <button type="submit" className="btn-primary" disabled={saving || disabled}>
               {saving ? 'Saving…' : submitLabel}
             </button>
           </div>
@@ -354,7 +397,10 @@ export function ResumeEditor({
           <div className="lg:sticky lg:top-6">
             <p className="label no-print mb-3 hidden text-ink-soft lg:block">Live preview</p>
             <div className="lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:rounded-sm">
-              <ResumeSheet resume={resume} compact />
+              <ResumeSheet
+                resume={{ ...effective, sex: identity?.sex ?? null, verifiedVia: identity?.provider ?? null }}
+                compact
+              />
             </div>
           </div>
         </div>

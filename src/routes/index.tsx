@@ -137,7 +137,7 @@ function Hero() {
           </a>
         </div>
         <p className="label mt-8 animate-in text-smoke/80 fade-in fill-mode-both delay-500 duration-700">
-          Free · Sign in with Google, Facebook or GitHub · Only you hold the pen
+          Free · Sign in with Google or GitHub · ID-checked members · Only you hold the pen
         </p>
       </div>
 
@@ -323,7 +323,7 @@ function Lounge() {
           <h3 className="mt-5 font-display text-2xl text-cream">A second reference check.</h3>
           <p className="mt-3 leading-relaxed text-smoke">
             Turn on an authenticator app and every edit needs a 6-digit code. Heartbreak-proof, or at least
-            password-proof.
+            hijack-proof.
           </p>
         </article>
 
@@ -331,7 +331,7 @@ function Lounge() {
           <p className="label text-gold">Sign in your way</p>
           <h3 className="mt-4 font-display text-2xl text-cream">One tap and you’re on the list.</h3>
           <div className="mt-6 flex flex-wrap gap-2">
-            {['Google', 'Facebook', 'GitHub', 'Email'].map((p) => (
+            {['Google', 'GitHub'].map((p) => (
               <span key={p} className="rounded-full border border-cream/15 px-4 py-1.5 text-sm text-cream">
                 {p}
               </span>

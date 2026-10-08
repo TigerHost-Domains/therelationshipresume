@@ -1,6 +1,7 @@
 // Server-only client for The Social Match Game's Relationship Resume integration. We ask their API for a one-time
 // invite for a resume, then send the member to the invite's join page; they sign in there with Google or GitHub,
 // pass age verification, and The Social Match Game attaches the resume to their profile itself.
+import type { Sex, SocialProvider } from '@/lib/member'
 import { SOCIAL_MATCH_API, SOCIAL_MATCH_SITE } from '@/lib/social-match'
 
 export class SocialMatchError extends Error {}
@@ -8,10 +9,27 @@ export class SocialMatchError extends Error {}
 export type SocialMatchInvite = { joinUrl: string; expiresAt?: string }
 
 /**
- * Creates a Social Match Game invite for this slug, authenticated with the shared `RESUME_INTEGRATION_SECRET`.
+ * The verified identity behind the resume, sent with the invite so The Social Match Game can build the profile from
+ * it and refuse the claim unless the Google/GitHub account signing in there has the same provider and email. Age is
+ * sent rather than the date of birth.
+ */
+export type SocialMatchMember = {
+  provider: SocialProvider
+  email: string | null
+  name: string
+  age: number
+  over21: true
+  sex: Sex
+  attestedAt: string | null
+  policyVersion: string | null
+}
+
+/**
+ * Creates a Social Match Game invite for this slug and its verified owner, authenticated with the shared
+ * `RESUME_INTEGRATION_SECRET`.
  * Throws `SocialMatchError` with a member-facing message.
  */
-export async function createSocialMatchInvite(slug: string): Promise<SocialMatchInvite> {
+export async function createSocialMatchInvite(slug: string, member: SocialMatchMember): Promise<SocialMatchInvite> {
   const secret = process.env.RESUME_INTEGRATION_SECRET
   if (!secret) {
     console.error('RESUME_INTEGRATION_SECRET is not set; Social Match invites are disabled.')
@@ -23,7 +41,7 @@ export async function createSocialMatchInvite(slug: string): Promise<SocialMatch
     res = await fetch(`${SOCIAL_MATCH_API}/api/integrations/relationship-resume/invites`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-integration-secret': secret },
-      body: JSON.stringify({ slug }),
+      body: JSON.stringify({ slug, member }),
       // Their backend naps when idle and can take most of a minute to wake; the dialog nudges it on open.
       signal: AbortSignal.timeout(45_000),
     })

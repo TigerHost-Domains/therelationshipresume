@@ -7,6 +7,7 @@ import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
 import { SocialMatchButton } from '@/components/SocialMatchConnect'
 import { getEditKey } from '@/lib/edit-keys'
 import { useIdentity } from '@/lib/identity-context'
+import { MIN_AGE_SOCIAL_MATCH } from '@/lib/member'
 import { getEditAccess, getResume } from '@/server/resumes.functions'
 
 export const Route = createFileRoute('/r/$slug/')({
@@ -46,6 +47,8 @@ function ResumePage() {
   const { slug } = Route.useParams()
   const { user, ready } = useIdentity()
   const [canEdit, setCanEdit] = useState(false)
+  // Only the person on the resume, aged 21+, can send it to The Social Match Game.
+  const [social, setSocial] = useState({ isOwner: false, canSend: false })
   // Edit keys only matter for resumes made before accounts: they let a member claim ownership.
   const [claimKey, setClaimKey] = useState<string>()
   const [origin, setOrigin] = useState('')
@@ -61,6 +64,7 @@ function ResumePage() {
     const key = getEditKey(slug)
     if (!user) {
       setCanEdit(false)
+      setSocial({ isOwner: false, canSend: false })
       setClaimKey(key)
       return
     }
@@ -68,6 +72,7 @@ function ResumePage() {
       .then((access) => {
         if (!live) return
         setCanEdit(access.canEdit)
+        setSocial({ isOwner: access.isOwner, canSend: access.canSendToSocialMatch })
         setClaimKey(access.unowned ? key : undefined)
       })
       .catch(() => {})
@@ -108,12 +113,14 @@ function ResumePage() {
                 </div>
               ))}
             </div>
-            {canEdit ? (
+            {social.isOwner ? (
               <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-rose/20 pt-4">
                 <p className="flex-1 text-sm text-ink-soft">
-                  On The Social Match Game? Pin this resume to your profile so matches can read the full application.
+                  {social.canSend
+                    ? 'On The Social Match Game? Pin this resume to your profile so matches can read the full application.'
+                    : `The Social Match Game is open to members ${MIN_AGE_SOCIAL_MATCH} and over — your resume can join you there then.`}
                 </p>
-                <SocialMatchButton slug={slug} className="bg-sheet" />
+                {social.canSend ? <SocialMatchButton slug={slug} className="bg-sheet" /> : null}
               </div>
             ) : null}
           </div>
@@ -127,7 +134,7 @@ function ResumePage() {
           <button type="button" className="btn-ghost" onClick={() => window.print()}>
             <Printer className="size-4" /> Print
           </button>
-          {canEdit ? <SocialMatchButton slug={slug} /> : null}
+          {social.canSend ? <SocialMatchButton slug={slug} /> : null}
           {showEdit ? (
             <Link to="/r/$slug/edit" params={{ slug }} search={{ key: claimKey }} className="btn-ghost">
               <PenLine className="size-4" /> Edit
