@@ -27,7 +27,7 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 | `src/routes/login.tsx` | Sign in / sign up / password reset / invite acceptance (`?redirect=` returns the member afterwards) |
 | `src/lib/auth.ts`, `src/middleware/identity.ts`, `src/lib/identity-context.tsx` | Netlify Identity (`@netlify/identity`): server user lookup, `requireAuthMiddleware`, client auth state |
 | `src/routes/account.tsx`, `src/server/mfa.ts`, `src/server/mfa.functions.ts` | Account page: the member's resume links (`listMyResumes`, owned + co-edited) and optional authenticator-app (TOTP) two-factor setup/disable, code checks, 2FA browser sessions |
-| `src/components/SocialMatchConnect.tsx`, `src/server/social-match.ts`, `src/lib/social-match.ts` | "Add to Social Match" button/dialog on the public resume page (and, compact, on each account-page resume row) and the server-side client that pins the resume to the member's Social Match Game profile |
+| `src/components/SocialMatchConnect.tsx`, `src/server/social-match.ts`, `src/lib/social-match.ts` | "Add to Social Match" button/dialog on the public resume page (and, compact, on each account-page resume row) and the server-side client that requests a Social Match Game invite for the resume |
 
 ## Non-obvious decisions
 
@@ -54,12 +54,15 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
   `gold`, `ember` tokens; `.after-hours`, `.film-grain`, `.gold-foil` classes) inspired by the companion site, The
   Social Match Game (https://socialmatchapp.onrender.com/). `SiteHeader` / `SiteFooter` take `tone="dark"` there; the
   rest of the app stays on the light paper theme.
-- **Social Match Game push.** (Their `/api/login` takes ~25s on success, hence the 40s login timeout.) `pushToSocialMatch` (editors only) signs in to the companion's API
-  (`socialmatchbackend.onrender.com`) with the member's Social Match email/password, PATCHes
-  `/api/members/aboutme` with a `{ label: 'Relationship Resume', url: 'https://therelationshipresume.netlify.app/r/<slug>' }`
-  link (other links kept), then logs out. It must run server-side: their CORS only allows their own origin. Credentials
-  are never stored. Members who joined there via Google/GitHub have no password, so the dialog shows the slug to paste
-  into their profile's "Relationship Resume username" field instead.
+- **Social Match Game handshake.** The Social Match Game has no passwords and no hand-entered resume links: members
+  sign in there with Google/GitHub only, and resumes arrive through an invite. `sendToSocialMatch` (editors only, 2FA
+  enforced) calls `createSocialMatchInvite`, which POSTs `{ slug }` to
+  `/api/integrations/relationship-resume/invites` with the `x-integration-secret: $RESUME_INTEGRATION_SECRET` header
+  and gets back `{ invite, expiresAt (7 days), joinUrl }`. The dialog sends the member to `joinUrl`
+  (`socialmatchapp.onrender.com/join?invite=…`); there they sign in, pass age verification, and their site claims the
+  invite (`/claim`) and pins the resume to the profile. Their CORS only allows their own origin, so the invite call
+  must stay server-side, and the secret never reaches the browser. Their backend naps when idle (45s timeout; the
+  dialog pings `/api/auth/providers` on open to wake it).
 - `.no-print` hides chrome when a resume is printed.
 
 ## Conventions

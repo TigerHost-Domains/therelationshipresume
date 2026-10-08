@@ -1,87 +1,57 @@
-// Server-only client for The Social Match Game's API. Its CORS policy only admits its own site, so the browser
-// can't call it from here; we do it server-to-server instead.
-import { SOCIAL_MATCH_API, SOCIAL_MATCH_LINK_LABEL, SOCIAL_MATCH_SITE } from '@/lib/social-match'
-
-/** The companion site builds Relationship Resume links on this host, so the pushed link matches its format. */
-const PUBLIC_ORIGIN = 'https://therelationshipresume.netlify.app'
-
-type SocialMatchLink = { label?: string; url?: string }
+// Server-only client for The Social Match Game's Relationship Resume integration. We ask their API for a one-time
+// invite for a resume, then send the member to the invite's join page; they sign in there with Google or GitHub,
+// pass age verification, and The Social Match Game attaches the resume to their profile itself.
+import { SOCIAL_MATCH_API, SOCIAL_MATCH_SITE } from '@/lib/social-match'
 
 export class SocialMatchError extends Error {}
 
-async function call(path: string, init: RequestInit & { token?: string; timeoutMs?: number } = {}) {
-  const { token, headers, timeoutMs = 5_000, ...rest } = init
+export type SocialMatchInvite = { joinUrl: string; expiresAt?: string }
+
+/**
+ * Creates a Social Match Game invite for this slug, authenticated with the shared `RESUME_INTEGRATION_SECRET`.
+ * Throws `SocialMatchError` with a member-facing message.
+ */
+export async function createSocialMatchInvite(slug: string): Promise<SocialMatchInvite> {
+  const secret = process.env.RESUME_INTEGRATION_SECRET
+  if (!secret) {
+    console.error('RESUME_INTEGRATION_SECRET is not set; Social Match invites are disabled.')
+    throw new SocialMatchError("The Social Match Game handshake isn't set up yet. Please try again later.")
+  }
+
   let res: Response
   try {
-    res = await fetch(`${SOCIAL_MATCH_API}${path}`, {
-      ...rest,
-      headers: {
-        'content-type': 'application/json',
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
-        ...headers,
-      },
-      signal: AbortSignal.timeout(timeoutMs),
+    res = await fetch(`${SOCIAL_MATCH_API}/api/integrations/relationship-resume/invites`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-integration-secret': secret },
+      body: JSON.stringify({ slug }),
+      // Their backend naps when idle and can take most of a minute to wake; the dialog nudges it on open.
+      signal: AbortSignal.timeout(45_000),
     })
   } catch {
     throw new SocialMatchError('The Social Match Game is still waking up. Give it a few seconds and try again.')
   }
+
   const body = (await res.json().catch(() => null)) as Record<string, unknown> | null
-  return { ok: res.ok, status: res.status, body }
-}
-
-/** Reads the member id out of the Social Match Game's JWT without verifying it; their API does that. */
-function memberIdFromToken(token: string): string | undefined {
-  try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString('utf8'))
-    const id = payload.id ?? payload._id ?? payload.memberId ?? payload.userId ?? payload.sub
-    return id ? String(id) : undefined
-  } catch {
-    return undefined
+  if (res.status === 401 || res.status === 403) {
+    console.error(`Social Match Game rejected the integration secret (${res.status}).`)
+    throw new SocialMatchError("The Social Match Game didn't accept our handshake. Please try again later.")
   }
-}
-
-/**
- * Signs in to the Social Match Game as the member, sets the Relationship Resume link on their profile (keeping any
- * other links), then signs back out. Credentials are used for this one request only. Throws `SocialMatchError`
- * with a member-facing message.
- */
-export async function linkResumeToProfile(slug: string, email: string, password: string) {
-  // A successful sign-in there routinely takes ~25s (failed ones return at once), and their backend also naps when
-  // idle; the dialog wakes it as soon as it opens. 40s here plus 5s per follow-up call stays under Netlify's 60s limit.
-  const login = await call('/api/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-    timeoutMs: 40_000,
-  })
-  const token = typeof login.body?.token === 'string' ? login.body.token : undefined
-  if (!login.ok || !token) {
+  if (!res.ok) {
     throw new SocialMatchError(
-      login.status === 400 || login.status === 401
-        ? "The Social Match Game didn't recognise that email and password."
-        : "The Social Match Game couldn't sign you in just now. Please try again.",
+      typeof body?.message === 'string' ? body.message : "The Social Match Game couldn't take your resume just now.",
     )
   }
 
-  try {
-    const memberId = memberIdFromToken(token)
-    let existing: SocialMatchLink[] = []
-    if (memberId) {
-      const profile = await call(`/api/members/${encodeURIComponent(memberId)}`, { token })
-      if (profile.ok && Array.isArray(profile.body?.links)) existing = profile.body.links as SocialMatchLink[]
-    }
-    const links = [
-      ...existing.filter((l) => l?.label?.toLowerCase() !== SOCIAL_MATCH_LINK_LABEL.toLowerCase()),
-      { label: SOCIAL_MATCH_LINK_LABEL, url: `${PUBLIC_ORIGIN}/r/${encodeURIComponent(slug)}` },
-    ]
-
-    const update = await call('/api/members/aboutme', { method: 'PATCH', token, body: JSON.stringify({ links }) })
-    if (!update.ok) throw new SocialMatchError("The Social Match Game didn't accept the update. Please try again.")
-
-    return memberId
-      ? `${SOCIAL_MATCH_SITE}/dashboard/profile?id=${encodeURIComponent(memberId)}`
-      : `${SOCIAL_MATCH_SITE}/dashboard`
-  } finally {
-    // Signing in marked the member as online there; sign back out so their status stays truthful.
-    await call('/api/login/logout', { method: 'POST', token }).catch(() => {})
+  const invite = typeof body?.invite === 'string' ? body.invite : undefined
+  const joinUrl =
+    typeof body?.joinUrl === 'string'
+      ? body.joinUrl
+      : invite
+        ? `${SOCIAL_MATCH_SITE}/join?invite=${encodeURIComponent(invite)}`
+        : undefined
+  // Only ever send members to The Social Match Game itself.
+  if (!joinUrl || new URL(joinUrl).origin !== SOCIAL_MATCH_SITE) {
+    throw new SocialMatchError("The Social Match Game couldn't take your resume just now.")
   }
+  return { joinUrl, expiresAt: typeof body?.expiresAt === 'string' ? body.expiresAt : undefined }
 }

@@ -7,7 +7,7 @@ import { db } from '../../db/index.js'
 import { resumes } from '../../db/schema.js'
 import { resumeInputSchema, type Resume } from '@/lib/resume'
 import { identityMiddleware, requireAuthMiddleware, requireSignInMiddleware } from '@/middleware/identity'
-import { linkResumeToProfile, SocialMatchError } from '@/server/social-match'
+import { createSocialMatchInvite, SocialMatchError } from '@/server/social-match'
 
 const slugId = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 6)
 const tokenId = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789', 32)
@@ -188,22 +188,20 @@ export const listMyResumes = createServerFn({ method: 'GET' })
   })
 
 /**
- * Adds a published resume to the member's Social Match Game profile. Their Social Match Game email and password are
- * forwarded once to sign in there and are never stored or logged.
+ * Starts the Social Match Game handshake for a published resume: asks their API for a one-time invite and returns its
+ * join link. The member finishes there (Google/GitHub sign-in, age check) and the resume is attached automatically.
  */
-export const pushToSocialMatch = createServerFn({ method: 'POST' })
+export const sendToSocialMatch = createServerFn({ method: 'POST' })
   .middleware([requireAuthMiddleware])
-  .inputValidator(
-    z.object({ slug: slugInput, email: z.email().max(254), password: z.string().min(1).max(200) }),
-  )
+  .inputValidator(z.object({ slug: slugInput }))
   .handler(async ({ data, context }) => {
     const row = await findRow(data.slug)
     if (!row || !access(row, context.user).canEdit) {
-      return { ok: false as const, error: 'Only people who can edit this resume can add it to a profile.' }
+      return { ok: false as const, error: 'Only people who can edit this resume can send it to The Social Match Game.' }
     }
     try {
-      const profileUrl = await linkResumeToProfile(row.slug, data.email.trim(), data.password)
-      return { ok: true as const, profileUrl }
+      const invite = await createSocialMatchInvite(row.slug)
+      return { ok: true as const, ...invite }
     } catch (err) {
       if (err instanceof SocialMatchError) return { ok: false as const, error: err.message }
       throw err
