@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowUpRight, Check, Copy, Heart, Loader2, X } from 'lucide-react'
+import { ArrowUpRight, Heart, Loader2, X } from 'lucide-react'
 import { MFA_REQUIRED } from '@/lib/mfa'
-import { SOCIAL_MATCH_API, SOCIAL_MATCH_SITE } from '@/lib/social-match'
+import { SOCIAL_MATCH_API } from '@/lib/social-match'
 import { cn } from '@/lib/utils'
-import { pushToSocialMatch } from '@/server/resumes.functions'
+import { sendToSocialMatch } from '@/server/resumes.functions'
 
 /**
- * Opens the dialog that adds this resume to the member's Social Match Game profile. `compact` renders a small text
+ * Opens the dialog that sends this resume to The Social Match Game, which attaches it to the member's profile. `compact` renders a small text
  * action for lists (the account page); `returnTo` is where a 2FA prompt sends the member back to.
  */
 export function SocialMatchButton({
@@ -41,28 +41,24 @@ export function SocialMatchButton({
 function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo: string; onClose: () => void }) {
   const navigate = useNavigate()
   const dialog = useRef<HTMLDialogElement>(null)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
-  const [profileUrl, setProfileUrl] = useState<string>()
-  const [copied, setCopied] = useState(false)
+  const [joinUrl, setJoinUrl] = useState<string>()
 
   useEffect(() => {
     dialog.current?.showModal()
-    // The Social Match Game's server naps when idle. Nudge it now so it's awake by the time the form is sent.
+    // The Social Match Game's server naps when idle. Nudge it now so it's awake by the time we ask for an invite.
     fetch(`${SOCIAL_MATCH_API}/api/auth/providers`, { mode: 'no-cors' }).catch(() => {})
   }, [])
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
+  const send = async () => {
     setBusy(true)
     setError(undefined)
     try {
-      const res = await pushToSocialMatch({ data: { slug, email, password } })
+      const res = await sendToSocialMatch({ data: { slug } })
       if (res.ok) {
-        setPassword('')
-        setProfileUrl(res.profileUrl)
+        setJoinUrl(res.joinUrl)
+        window.location.assign(res.joinUrl)
       } else {
         setError(res.error)
       }
@@ -75,12 +71,6 @@ function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo
     } finally {
       setBusy(false)
     }
-  }
-
-  const copySlug = async () => {
-    await navigator.clipboard.writeText(slug)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
   }
 
   return (
@@ -101,85 +91,45 @@ function SocialMatchDialog({ slug, returnTo, onClose }: { slug: string; returnTo
         </button>
 
         <p className="label text-rose">Cross-posting</p>
-        {profileUrl ? (
+        {joinUrl ? (
           <>
-            <h2 className="mt-2 font-display text-3xl">You're on the shortlist.</h2>
+            <h2 className="mt-2 font-display text-3xl">Application forwarded.</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              Your Relationship Resume now appears on your Social Match Game profile, so anyone who likes your card
-              can read the full application.
+              Taking you to The Social Match Game to finish the interview. If nothing happens, use the button below.
             </p>
-            <a href={profileUrl} target="_blank" rel="noreferrer" className="btn-primary mt-6 w-full">
-              View my Social Match profile <ArrowUpRight className="size-4" />
+            <a href={joinUrl} className="btn-primary mt-6 w-full">
+              Continue to The Social Match Game <ArrowUpRight className="size-4" />
             </a>
           </>
         ) : (
           <>
-            <h2 className="mt-2 font-display text-3xl">Attach to your Social Match profile</h2>
+            <h2 className="mt-2 font-display text-3xl">Send to The Social Match Game</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              Sign in with your Social Match Game account and we'll pin this resume to your profile. Your password
-              goes straight to The Social Match Game; we never keep it.
+              We'll hand your resume to The Social Match Game and send you over to finish the paperwork:
             </p>
-
-            <form onSubmit={submit} className="mt-5 grid gap-3">
-              <label className="grid gap-1">
-                <span className="label text-ink-soft">Social Match email</span>
-                <input
-                  type="email"
-                  className="field"
-                  required
-                  autoComplete="username"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </label>
-              <label className="grid gap-1">
-                <span className="label text-ink-soft">Social Match password</span>
-                <input
-                  type="password"
-                  className="field"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </label>
-              {error ? (
-                <p role="alert" className="text-sm text-rose">
-                  {error}
-                </p>
-              ) : null}
-              <button type="submit" className="btn-primary mt-1" disabled={busy}>
-                {busy ? <Loader2 className="size-4 animate-spin" /> : <Heart className="size-4" />}
-                {busy ? 'Submitting your application…' : 'Add to my profile'}
-              </button>
-              {busy ? (
-                <p className="text-center text-xs text-ink-soft">
-                  The Social Match Game takes its time reviewing applicants — this can take up to half a minute.
-                </p>
-              ) : null}
-            </form>
-
-            <div className="mt-6 border-t border-rule pt-4 text-xs text-ink-soft">
-              <p>
-                Joined The Social Match Game with Google or GitHub? Copy your resume username below, then paste it
-                into <em>Edit details → Relationship Resume username</em> on your{' '}
-                <a href={`${SOCIAL_MATCH_SITE}/dashboard`} target="_blank" rel="noreferrer" className="underline">
-                  Social Match profile
-                </a>
-                .
+            <ol className="mt-3 grid list-decimal gap-1 pl-5 text-sm text-ink-soft">
+              <li>Sign in there with Google or GitHub.</li>
+              <li>Confirm you're 21 or older and accept their policies.</li>
+              <li>Your resume is pinned to your profile automatically.</li>
+            </ol>
+            {error ? (
+              <p role="alert" className="mt-4 text-sm text-rose">
+                {error}
               </p>
-              <div className="mt-2 flex items-center gap-2 rounded-md border border-rule bg-paper py-1.5 pr-1.5 pl-3">
-                <span className="flex-1 truncate font-mono">{slug}</span>
-                <button
-                  type="button"
-                  onClick={copySlug}
-                  className="inline-flex items-center gap-1 rounded px-2 py-1 hover:bg-blush"
-                >
-                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                  {copied ? 'Copied' : 'Copy'}
-                </button>
-              </div>
-            </div>
+            ) : null}
+            <button type="button" className="btn-primary mt-6 w-full" onClick={send} disabled={busy}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : <Heart className="size-4" />}
+              {busy ? 'Forwarding your application…' : 'Send my resume'}
+            </button>
+            {busy ? (
+              <p className="mt-2 text-center text-xs text-ink-soft">
+                The Social Match Game can take up to a minute to wake up after a quiet spell.
+              </p>
+            ) : (
+              <p className="mt-2 text-center text-xs text-ink-soft">
+                The invite is good for a week, and no passwords change hands.
+              </p>
+            )}
           </>
         )}
       </div>
