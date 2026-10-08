@@ -65,8 +65,9 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
   rest of the app stays on the light paper theme.
 - **Social Match Game handshake.** The Social Match Game has no passwords and no hand-entered resume links: members
   sign in there with Google/GitHub only, and resumes arrive through an invite. `sendToSocialMatch` (the resume's owner
-  only, verified and 21+, 2FA enforced) calls `createSocialMatchInvite`, which POSTs `{ slug, member }` (provider,
-  email, name, age, sex, `over21`, attestation date and policy version — age, not date of birth) to
+  only, verified and 21+, 2FA enforced) calls `createSocialMatchInvite`, which POSTs `{ slug, name, dateOfBirth, sex, email, provider, member }` (their API
+  validates name, `dateOfBirth` (YYYY-MM-DD) and sex at the top level; `member` repeats them plus age, `over21`,
+  attestation date and policy version) to
   `/api/integrations/relationship-resume/invites` with the `x-integration-secret: $RESUME_INTEGRATION_SECRET` header
   and gets back `{ invite, expiresAt (7 days), joinUrl }`. The dialog sends the member to `joinUrl`
   (`socialmatchapp.onrender.com/join?invite=…`); there they sign in, pass age verification, and their site claims the

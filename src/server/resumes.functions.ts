@@ -260,7 +260,7 @@ export const sendToSocialMatch = createServerFn({ method: 'POST' })
     }
     const profile = await getProfile(context.user.id)
     const identity = identityOf(profile)
-    if (!identity || !profile) throw new Error(IDENTITY_REQUIRED)
+    if (!identity || !profile?.birthDate) throw new Error(IDENTITY_REQUIRED)
     if (identity.age < MIN_AGE_SOCIAL_MATCH) {
       return {
         ok: false as const,
@@ -272,6 +272,7 @@ export const sendToSocialMatch = createServerFn({ method: 'POST' })
         provider: identity.provider,
         email: profile.providerEmail ?? context.user.email?.toLowerCase() ?? null,
         name: identity.legalName,
+        dateOfBirth: profile.birthDate,
         age: identity.age,
         over21: true,
         sex: identity.sex,
