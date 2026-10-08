@@ -14,9 +14,11 @@ import {
   type DraftSummary,
 } from '@/lib/drafts'
 import { useIdentity } from '@/lib/identity-context'
+import { IDENTITY_REQUIRED, MIN_AGE_RESUME, socialProviderOf, type ResumeIdentity } from '@/lib/member'
 import { MFA_REQUIRED } from '@/lib/mfa'
 import { emptyResume, type ResumeInput } from '@/lib/resume'
 import { cn } from '@/lib/utils'
+import { getMyIdentity } from '@/server/members.functions'
 import { createResume } from '@/server/resumes.functions'
 
 export const Route = createFileRoute('/create')({
@@ -42,6 +44,21 @@ function CreatePage() {
   // so switching slots never copies one draft into the other.
   const [loaded, setLoaded] = useState<{ slot: DraftSlot; resume: ResumeInput; version: number } | null>(null)
   const [drafts, setDrafts] = useState<Record<DraftSlot, DraftSummary | null>>({ 1: null, 2: null })
+  const [me, setMe] = useState<Awaited<ReturnType<typeof getMyIdentity>> | null>(null)
+  const signedIn = ready && !!user && !!socialProviderOf(user)
+
+  useEffect(() => {
+    if (!signedIn) return setMe(null)
+    getMyIdentity()
+      .then(setMe)
+      .catch(() => setMe(null))
+  }, [signedIn])
+
+  const identity: ResumeIdentity | null =
+    me?.status === 'verified' && me.legalName && me.age !== null && me.sex
+      ? { legalName: me.legalName, age: me.age, sex: me.sex, provider: me.provider }
+      : null
+  const underAge = me?.status === 'refused' || (me?.age != null && me.age < MIN_AGE_RESUME)
 
   useEffect(() => {
     setLoaded((prev) => ({ slot, resume: loadDraft(slot) ?? emptyResume, version: (prev?.version ?? 0) + 1 }))
@@ -74,7 +91,7 @@ function CreatePage() {
           Fill in as much or as little as you like — your page updates as you type. When you publish, you get a link
           to share on your dating profile, in your bio, or with a friend who loves to set people up.
         </p>
-        {ready && !user ? (
+        {ready && !signedIn ? (
           <p className="mt-3 max-w-xl text-sm text-ink-soft">
             Drafting is open to all; publishing takes a member account so only you can make revisions.{' '}
             <Link to="/login" search={{ redirect: `/create?draft=${slot}` }} className="text-rose underline">
@@ -129,11 +146,28 @@ function CreatePage() {
       <ResumeEditor
         key={loaded ? `${loaded.slot}-${loaded.version}` : 'loading'}
         initial={loaded?.resume ?? emptyResume}
-        submitLabel={ready && !user ? 'Sign in to publish' : 'Publish my resume'}
+        identity={identity}
+        disabled={underAge}
+        identityNote={
+          underAge ? (
+            <>Relationship Resumes are for members {MIN_AGE_RESUME} and over, so publishing is closed on this account.</>
+          ) : signedIn && me?.status === 'missing' ? (
+            <>
+              One quick background check before you publish: your name comes from your sign-in account, and you
+              swear to your date of birth and sex once.{' '}
+              <Link to="/verify" search={{ redirect: `/create?draft=${slot}` }} className="text-rose underline">
+                Complete your identity check
+              </Link>
+            </>
+          ) : undefined
+        }
+        submitLabel={
+          !signedIn ? 'Sign in to publish' : me?.status === 'missing' ? 'Verify & publish' : 'Publish my resume'
+        }
         onChange={autosave}
         onSubmit={async (resume) => {
           const here = `/create?draft=${slot}`
-          if (!user) {
+          if (!signedIn) {
             saveDraft(slot, resume)
             await navigate({ to: '/login', search: { redirect: here } })
             return
@@ -145,6 +179,11 @@ function CreatePage() {
             if (err instanceof Error && err.message === MFA_REQUIRED) {
               saveDraft(slot, resume)
               await navigate({ to: '/login', search: { mode: 'mfa', redirect: here } })
+              return
+            }
+            if (err instanceof Error && err.message === IDENTITY_REQUIRED) {
+              saveDraft(slot, resume)
+              await navigate({ to: '/verify', search: { redirect: here } })
               return
             }
             throw err

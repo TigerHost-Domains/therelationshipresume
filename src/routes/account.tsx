@@ -1,12 +1,15 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { createFileRoute, Link, redirect, useRouter } from '@tanstack/react-router'
 import { Check, Copy, FileText, PenLine, Plus, ShieldCheck } from 'lucide-react'
+import { IdentityOnFile } from '@/components/IdentityOnFile'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
 import { SocialMatchButton } from '@/components/SocialMatchConnect'
 import { getServerUser } from '@/lib/auth'
 import { useIdentity } from '@/lib/identity-context'
+import { MIN_AGE_SOCIAL_MATCH } from '@/lib/member'
 import { ACCENTS } from '@/lib/resume'
 import { confirmMfaSetup, disableMfa, getMfaStatus, startMfaSetup } from '@/server/mfa.functions'
+import { getMyIdentity } from '@/server/members.functions'
 import { listMyResumes } from '@/server/resumes.functions'
 
 export const Route = createFileRoute('/account')({
@@ -16,8 +19,8 @@ export const Route = createFileRoute('/account')({
     return { user }
   },
   loader: async () => {
-    const [status, myResumes] = await Promise.all([getMfaStatus(), listMyResumes()])
-    return { status, myResumes }
+    const [status, myResumes, identity] = await Promise.all([getMfaStatus(), listMyResumes(), getMyIdentity()])
+    return { status, myResumes, identity }
   },
   head: () => ({ meta: [{ title: 'Your account · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
   component: AccountPage,
@@ -25,7 +28,7 @@ export const Route = createFileRoute('/account')({
 
 function AccountPage() {
   const { user } = Route.useRouteContext()
-  const { status, myResumes } = Route.useLoaderData()
+  const { status, myResumes, identity } = Route.useLoaderData()
   const router = useRouter()
   const { logout } = useIdentity()
   const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null)
@@ -96,7 +99,28 @@ function AccountPage() {
           </button>
         </p>
 
-        <MyResumes resumes={myResumes} />
+        <section className="mt-10">
+          <h2 className="font-display text-2xl">Identity on file</h2>
+          {identity.status === 'verified' ? (
+            <IdentityOnFile identity={identity} />
+          ) : identity.status === 'refused' ? (
+            <p className="mt-2 text-sm text-ink-soft">
+              This account reported an age under 18, so it can't publish resumes. No other details were kept.
+            </p>
+          ) : (
+            <div className="sheet mt-4 rounded-lg p-6 text-sm">
+              <p className="text-ink-soft">
+                Not yet. Publishing and editing need a one-time identity check: your name from your sign-in account,
+                plus your sworn date of birth and sex.
+              </p>
+              <Link to="/verify" search={{ redirect: '/account' }} className="btn-primary mt-4">
+                Complete your identity check
+              </Link>
+            </div>
+          )}
+        </section>
+
+        <MyResumes resumes={myResumes} canSendToSocialMatch={identity.canSendToSocialMatch} />
 
         <section className="sheet mt-10 rounded-lg p-6">
           <div className="flex items-start gap-3">
@@ -143,7 +167,7 @@ function AccountPage() {
 
 type MyResume = Awaited<ReturnType<typeof listMyResumes>>[number]
 
-function MyResumes({ resumes }: { resumes: MyResume[] }) {
+function MyResumes({ resumes, canSendToSocialMatch }: { resumes: MyResume[]; canSendToSocialMatch: boolean }) {
   const [origin, setOrigin] = useState('')
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -167,7 +191,11 @@ function MyResumes({ resumes }: { resumes: MyResume[] }) {
             {resumes.length
               ? 'Every resume on file under your name, plus any you’ve been asked to co-edit. Share the link with anyone worth interviewing.'
               : 'No applications on file yet. Write one and its link will be kept here.'}
-            {resumes.length ? ' You can also pin any of them to your Social Match Game profile.' : null}
+            {resumes.length
+              ? canSendToSocialMatch
+                ? ' You can also pin your own to your Social Match Game profile.'
+                : ` From ${MIN_AGE_SOCIAL_MATCH}, you can also pin your own to a Social Match Game profile.`
+              : null}
           </p>
         </div>
       </div>
@@ -212,7 +240,9 @@ function MyResumes({ resumes }: { resumes: MyResume[] }) {
                       <PenLine className="size-3.5" />
                       Edit
                     </Link>
-                    <SocialMatchButton slug={r.slug} compact returnTo="/account" />
+                    {canSendToSocialMatch && r.role === 'owner' ? (
+                      <SocialMatchButton slug={r.slug} compact returnTo="/account" />
+                    ) : null}
                   </div>
                 </li>
               )

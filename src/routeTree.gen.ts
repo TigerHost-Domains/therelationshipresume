@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as RSlugIndexRouteImport } from './routes/r/$slug/index'
 import { Route as RSlugEditRouteImport } from './routes/r/$slug/edit'
 
@@ -36,6 +37,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RSlugIndexRoute = RSlugIndexRouteImport.update({
   id: '/r/$slug/',
   path: '/r/$slug/',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/verify': typeof VerifyRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug/': typeof RSlugIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/verify': typeof VerifyRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug': typeof RSlugIndexRoute
 }
@@ -69,21 +77,36 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/verify': typeof VerifyRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug/': typeof RSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/account' | '/create' | '/login' | '/r/$slug/edit' | '/r/$slug/'
+    | '/'
+    | '/account'
+    | '/create'
+    | '/login'
+    | '/verify'
+    | '/r/$slug/edit'
+    | '/r/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/create' | '/login' | '/r/$slug/edit' | '/r/$slug'
+  to:
+    | '/'
+    | '/account'
+    | '/create'
+    | '/login'
+    | '/verify'
+    | '/r/$slug/edit'
+    | '/r/$slug'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/create'
     | '/login'
+    | '/verify'
     | '/r/$slug/edit'
     | '/r/$slug/'
   fileRoutesById: FileRoutesById
@@ -93,6 +116,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   CreateRoute: typeof CreateRoute
   LoginRoute: typeof LoginRoute
+  VerifyRoute: typeof VerifyRoute
   RSlugEditRoute: typeof RSlugEditRoute
   RSlugIndexRoute: typeof RSlugIndexRoute
 }
@@ -127,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/r/$slug/': {
       id: '/r/$slug/'
       path: '/r/$slug'
@@ -149,18 +180,10 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   CreateRoute: CreateRoute,
   LoginRoute: LoginRoute,
+  VerifyRoute: VerifyRoute,
   RSlugEditRoute: RSlugEditRoute,
   RSlugIndexRoute: RSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

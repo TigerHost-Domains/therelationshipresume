@@ -66,7 +66,9 @@ export function clearDraft(slot: DraftSlot) {
 export function listDrafts(): Record<DraftSlot, DraftSummary | null> {
   const summary = (slot: DraftSlot) => {
     const draft = read(slot)
-    return draft ? { name: draft.resume.name.trim(), updatedAt: draft.updatedAt } : null
+    return draft
+      ? { name: (draft.resume.name || draft.resume.headline).trim().slice(0, 40), updatedAt: draft.updatedAt }
+      : null
   }
   return { 1: summary(1), 2: summary(2) }
 }

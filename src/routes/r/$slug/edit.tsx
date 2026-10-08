@@ -14,6 +14,8 @@ export const Route = createFileRoute('/r/$slug/edit')({
     const user = await getServerUser()
     if (!user) throw redirect({ to: '/login', search: { redirect: location.href } })
     if (user.mfaPending) throw redirect({ to: '/login', search: { mode: 'mfa', redirect: location.href } })
+    // Editing takes a completed identity check (and 18+); /verify explains a refusal too.
+    if (user.identity !== 'verified') throw redirect({ to: '/verify', search: { redirect: location.href } })
     return { user }
   },
   loaderDeps: ({ search }) => ({ key: search.key }),
@@ -61,6 +63,8 @@ function EditPage() {
       </div>
       <ResumeEditor
         initial={initial}
+        identity={result.identity}
+        identityNote="This resume's owner hasn't completed the identity check yet, so its name and age stay as they were."
         submitLabel="Save changes"
         onSubmit={async (next) => {
           await updateResume({ data: { slug, resume: next } })

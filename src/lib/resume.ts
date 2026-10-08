@@ -1,12 +1,15 @@
 import { z } from 'zod'
+import { NAME_STYLES, type Sex, type SocialProvider } from '@/lib/member'
 
 const shortText = (max: number) => z.string().trim().max(max)
 const list = (max: number, itemMax = 80) =>
   z.array(z.string().trim().min(1).max(itemMax)).max(max)
 
 export const resumeInputSchema = z.object({
-  name: shortText(60).min(1, 'Your name is required'),
+  // Name and age are filled in from the verified identity on file; the server ignores whatever is sent here.
+  name: shortText(60),
   age: shortText(10),
+  nameStyle: z.enum(NAME_STYLES).catch('first-initial'),
   location: shortText(80),
   headline: shortText(120),
   objective: shortText(600),
@@ -40,7 +43,13 @@ export const resumeInputSchema = z.object({
 })
 
 export type ResumeInput = z.infer<typeof resumeInputSchema>
-export type Resume = ResumeInput & { slug: string; createdAt: string }
+export type Resume = ResumeInput & {
+  slug: string
+  createdAt: string
+  /** From the owner's identity on file; null for older resumes whose owner hasn't completed the check. */
+  sex: Sex | null
+  verifiedVia: SocialProvider | null
+}
 
 export const ACCENTS: Record<ResumeInput['accent'], { label: string; color: string }> = {
   rose: { label: 'Rosé', color: '#b3263e' },
@@ -60,6 +69,7 @@ export const LOVE_LANGUAGES = [
 export const emptyResume: ResumeInput = {
   name: '',
   age: '',
+  nameStyle: 'first-initial',
   location: '',
   headline: '',
   objective: '',
@@ -79,6 +89,7 @@ export const emptyResume: ResumeInput = {
 export const sampleResume: ResumeInput = {
   name: 'Juniper Hale',
   age: '31',
+  nameStyle: 'full',
   location: 'Portland, OR',
   headline: 'Amateur baker, professional overthinker, seeking co-pilot for Sunday markets',
   objective:

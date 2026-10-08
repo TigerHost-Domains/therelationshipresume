@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { Heart, MapPin, Mail, X } from 'lucide-react'
+import { BadgeCheck, Heart, MapPin, Mail, X } from 'lucide-react'
+import { PROVIDER_LABELS, SEXES, type Sex, type SocialProvider } from '@/lib/member'
 import { ACCENTS, type ResumeInput } from '@/lib/resume'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -32,9 +33,16 @@ function Placeholder({ children }: { children: ReactNode }) {
 }
 
 /** The printable one-page resume. Used on the landing page, in the builder preview and on shared pages. */
-export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; compact?: boolean }) {
+export function ResumeSheet({
+  resume,
+  compact = false,
+}: {
+  /** `sex` and `verifiedVia` come from the owner's identity on file, when there is one. */
+  resume: ResumeInput & { sex?: Sex | null; verifiedVia?: SocialProvider | null }
+  compact?: boolean
+}) {
   const accent = ACCENTS[resume.accent]?.color ?? ACCENTS.rose.color
-  const meta = [resume.age && `${resume.age} years`, resume.location].filter(Boolean)
+  const meta = [resume.age && `${resume.age} years`, resume.sex && SEXES[resume.sex], resume.location].filter(Boolean)
 
   return (
     <article
@@ -44,7 +52,17 @@ export function ResumeSheet({ resume, compact = false }: { resume: ResumeInput; 
       <div className="absolute inset-x-0 top-0 h-1.5 bg-[var(--accent)]" />
 
       <header className="border-b border-ink/10 pb-7">
-        <p className="label text-ink-soft">Relationship Resume</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="label text-ink-soft">Relationship Resume</p>
+          {resume.verifiedVia ? (
+            <p
+              className="label inline-flex items-center gap-1 text-[var(--accent)]"
+              title="Name from their sign-in account; age and sex sworn under our truthful identity policy."
+            >
+              <BadgeCheck className="size-3.5" /> ID checked · {PROVIDER_LABELS[resume.verifiedVia]}
+            </p>
+          ) : null}
+        </div>
         <h1
           className={`mt-3 font-display font-semibold leading-[0.95] tracking-tight ${compact ? 'text-4xl @3xl:text-5xl' : 'text-5xl sm:text-6xl xl:text-7xl'}`}
         >

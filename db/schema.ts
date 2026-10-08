@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, date, index, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 
 export type ExperienceEntry = {
   role: string
@@ -37,6 +37,9 @@ export const resumes = pgTable('resumes', {
   references: jsonb().$type<ReferenceEntry[]>().notNull().default([]),
   contact: text().notNull().default(''),
   accent: text().notNull().default('rose'),
+  // How the owner's verified name appears on the page: 'first-initial', 'first' or 'full'. The name itself always
+  // comes from member_profiles; `name` and `age` above are a snapshot written on each save.
+  nameStyle: text('name_style').notNull().default('first-initial'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -65,3 +68,22 @@ export const mfaSessions = pgTable(
   },
   (t) => [index('mfa_sessions_user_id_idx').on(t.userId)],
 )
+
+// Each member's identity on file. The name comes from their Google/GitHub account (or is sworn when the account
+// shares none); date of birth and sex are sworn once. None of it can be changed by the member afterwards.
+export const memberProfiles = pgTable('member_profiles', {
+  userId: text('user_id').primaryKey(),
+  provider: text().notNull(),
+  providerEmail: text('provider_email'),
+  legalName: text('legal_name'),
+  // 'provider' when the name came from Google/GitHub, 'attested' when the member typed it in.
+  nameSource: text('name_source'),
+  birthDate: date('birth_date', { mode: 'string' }),
+  sex: text(),
+  policyVersion: text('policy_version'),
+  attestedAt: timestamp('attested_at'),
+  // Set when the member reported an age under 18. Nothing else about them is kept, and the check can't be retried.
+  refusedAt: timestamp('refused_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
