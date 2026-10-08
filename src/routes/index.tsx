@@ -15,21 +15,21 @@ const STEPS = [
     no: '01',
     tag: 'Write',
     icon: PenLine,
-    title: 'Fill in the page',
+    title: 'Fill in the Page',
     body: 'Qualities, likes, dislikes, dealbreakers and love languages, plus “experience” in the field. It typesets as you type.',
   },
   {
     no: '02',
     tag: 'Vouch',
     icon: Quote,
-    title: 'Collect references',
+    title: 'Collect References',
     body: 'Quotes from the people who know you best. Your ex-roommate, your sister, the barista who’s seen it all.',
   },
   {
     no: '03',
     tag: 'Send',
     icon: Send,
-    title: 'Share one link',
+    title: 'Share One Link',
     body: 'Drop it in your dating profile, your bio, or hand it to the friend who swears they know someone perfect.',
   },
 ]
@@ -50,35 +50,35 @@ const PHOTOS = [
   {
     src: '/images/black-love/field-embrace.jpg',
     alt: 'A Black couple embracing in a sunlit field, the man resting his head on the woman’s arm',
-    tag: 'Exhibit A · Long-term position',
+    tag: 'Exhibit A · Long-Term Position',
     credit: { name: 'Ricardo Esquivel', url: 'https://unsplash.com/photos/O8i3pW1leYs' },
     className: 'col-span-2 row-span-2 lg:col-span-5 lg:row-span-4',
   },
   {
     src: '/images/black-love/forehead-kiss.jpg',
     alt: 'A Black man kissing his partner’s forehead outdoors on a bright day',
-    tag: 'References: glowing',
+    tag: 'References: Glowing',
     credit: { name: 'LaShawn Dobbs', url: 'https://unsplash.com/photos/Qx-jCqiTezY' },
     className: 'col-span-2 lg:col-span-4 lg:row-span-2',
   },
   {
     src: '/images/black-love/after-dark.jpg',
     alt: 'A Black couple posing together in black tank tops against a dark backdrop',
-    tag: 'Culture fit: perfect',
+    tag: 'Culture Fit: Perfect',
     credit: { name: 'MONIQUE BEN', url: 'https://unsplash.com/photos/gW_uUms6Rrw' },
     className: 'lg:col-span-3 lg:row-span-2 [&_img]:object-top',
   },
   {
     src: '/images/black-love/hands-on-heart.jpg',
     alt: 'A woman’s hands, wearing an engagement ring, resting on the chest of a Black man in a tuxedo',
-    tag: 'Tenure: for life',
+    tag: 'Tenure: For Life',
     credit: { name: 'Clay Banks', url: 'https://unsplash.com/photos/_3Sud4WPPYE' },
     className: 'lg:col-span-3 lg:row-span-2',
   },
   {
     src: '/images/black-love/close-embrace.jpg',
     alt: 'A Black couple holding each other close, about to kiss',
-    tag: 'Mutual offer accepted',
+    tag: 'Mutual Offer Accepted',
     credit: { name: 'One zone Studio', url: 'https://unsplash.com/photos/9B4hD5joEk4' },
     className: 'col-span-2 lg:col-span-4 lg:row-span-2',
   },
@@ -115,11 +115,11 @@ function Hero() {
       <div>
         <p className="label inline-flex animate-in items-center gap-2 rounded-full border border-gold/30 bg-velvet/70 px-3 py-1.5 text-gold-bright fade-in fill-mode-both duration-700">
           <Heart className="size-3 animate-pulse-heart fill-rose text-rose motion-safe-only" />
-          Now accepting applications
+          Now Accepting Applications
         </p>
         <h1 className="mt-7 animate-in font-display text-[3.4rem] leading-[0.92] font-medium tracking-tight fade-in slide-in-from-bottom-4 fill-mode-both delay-100 duration-700 sm:text-[5.5rem] xl:text-[6.5rem] 2xl:text-[7.25rem]">
-          We’re here to find <em className="gold-foil pr-2 font-semibold">love,</em>
-          <span className="block text-rose italic">baby.</span>
+          We’re Here to Find <em className="gold-foil pr-2 font-semibold">Love,</em>
+          <span className="block text-rose italic">Baby.</span>
         </h1>
         <p className="mt-7 max-w-[34rem] animate-in text-lg leading-relaxed text-smoke xl:text-xl xl:leading-relaxed fade-in slide-in-from-bottom-3 fill-mode-both delay-200 duration-700">
           Dating profiles show what you look like. A Relationship Resume shows what it’s like to love you: what you
@@ -130,14 +130,14 @@ function Hero() {
             to="/create"
             className="btn-primary px-7 py-3.5 text-base shadow-[0_10px_40px_-10px_rgba(179,38,62,0.9)]"
           >
-            Write your resume <ArrowRight className="size-4" />
+            Write Your Resume <ArrowRight className="size-4" />
           </Link>
           <a href="#example" className={`${ghostDark} px-7 py-3.5 text-base`}>
-            Read an example
+            Read an Example
           </a>
         </div>
         <p className="label mt-8 animate-in text-smoke/80 fade-in fill-mode-both delay-500 duration-700">
-          Free · Sign in with Google or GitHub · ID-checked members · Only you hold the pen
+          Free · Sign In with Google or GitHub · ID-Checked Members · Only You Hold the Pen
         </p>
       </div>
 
@@ -165,7 +165,7 @@ function Hero() {
             <Heart className="size-4 fill-rose text-rose" />
           </span>
           <span className="text-sm leading-tight">
-            <span className="block font-display text-base text-cream">It’s a match.</span>
+            <span className="block font-display text-base text-cream">It’s a Match.</span>
             <span className="text-smoke">References checked out.</span>
           </span>
         </div>
@@ -197,9 +197,9 @@ function OnTheRecord() {
     <section className="mx-auto max-w-site px-6 pt-28 lg:px-10 xl:pt-36" aria-labelledby="on-the-record">
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <p className="label text-gold">Proof of concept</p>
+          <p className="label text-gold">Proof of Concept</p>
           <h2 id="on-the-record" className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
-            Black love, <em className="gold-foil">on the record.</em>
+            Black Love, <em className="gold-foil">on the Record.</em>
           </h2>
         </div>
         <p className="max-w-md text-lg leading-relaxed text-smoke lg:justify-self-end">
@@ -253,9 +253,9 @@ function HowItWorks() {
     <section className="mx-auto max-w-site px-6 py-28 lg:px-10 xl:py-36">
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
         <div>
-          <p className="label text-gold">How it works</p>
+          <p className="label text-gold">How It Works</p>
           <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
-            Skip the small talk. <em className="text-rose">Send the summary.</em>
+            Skip the Small Talk. <em className="text-rose">Send the Summary.</em>
           </h2>
         </div>
         <p className="max-w-md text-lg leading-relaxed text-smoke lg:justify-self-end">
@@ -292,15 +292,15 @@ function HowItWorks() {
 function Lounge() {
   return (
     <section className="mx-auto max-w-site px-6 pt-10 pb-28 lg:px-10 xl:pb-36">
-      <p className="label text-gold">The members’ lounge</p>
+      <p className="label text-gold">The Members’ Lounge</p>
       <h2 className="mt-4 max-w-3xl font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl xl:text-6xl">
-        Your love life, <em className="gold-foil">under lock and key.</em>
+        Your Love Life, <em className="gold-foil">Under Lock and Key.</em>
       </h2>
 
       <div className="mt-14 grid gap-5 md:grid-cols-6 xl:gap-7">
         <article className="relative overflow-hidden rounded-2xl border border-ember bg-gradient-to-br from-velvet-soft to-velvet p-8 xl:p-10 md:col-span-4">
           <KeyRound className="size-6 text-gold-bright" />
-          <h3 className="mt-5 font-display text-3xl text-cream">Only you hold the pen.</h3>
+          <h3 className="mt-5 font-display text-3xl text-cream">Only You Hold the Pen.</h3>
           <p className="mt-3 max-w-md leading-relaxed text-smoke">
             Your resume is tied to your account. Anyone can read it; nobody can rewrite it. Revise it from any
             device whenever your dealbreakers evolve.
@@ -312,7 +312,7 @@ function Lounge() {
 
         <article className="rounded-2xl border border-rose/30 bg-rose/10 p-8 xl:p-10 md:col-span-2">
           <Users className="size-6 text-rose" />
-          <h3 className="mt-5 font-display text-2xl text-cream">Bring a wingperson.</h3>
+          <h3 className="mt-5 font-display text-2xl text-cream">Bring a Wingperson.</h3>
           <p className="mt-3 leading-relaxed text-smoke">
             Add your best friend as a co-editor. They know your best angles better than you do.
           </p>
@@ -320,7 +320,7 @@ function Lounge() {
 
         <article className="rounded-2xl border border-ember bg-velvet/80 p-8 xl:p-10 md:col-span-3">
           <ShieldCheck className="size-6 text-gold-bright" />
-          <h3 className="mt-5 font-display text-2xl text-cream">A second reference check.</h3>
+          <h3 className="mt-5 font-display text-2xl text-cream">A Second Reference Check.</h3>
           <p className="mt-3 leading-relaxed text-smoke">
             Turn on an authenticator app and every edit needs a 6-digit code. Heartbreak-proof, or at least
             hijack-proof.
@@ -328,8 +328,8 @@ function Lounge() {
         </article>
 
         <article className="rounded-2xl border border-ember bg-velvet/80 p-8 xl:p-10 md:col-span-3">
-          <p className="label text-gold">Sign in your way</p>
-          <h3 className="mt-4 font-display text-2xl text-cream">One tap and you’re on the list.</h3>
+          <p className="label text-gold">Sign In Your Way</p>
+          <h3 className="mt-4 font-display text-2xl text-cream">One Tap and You’re on the List.</h3>
           <div className="mt-6 flex flex-wrap gap-2">
             {['Google', 'GitHub'].map((p) => (
               <span key={p} className="rounded-full border border-cream/15 px-4 py-1.5 text-sm text-cream">
@@ -350,13 +350,13 @@ function Example() {
       <div className="mx-auto max-w-page px-4 sm:px-6">
         <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div>
-            <p className="label text-rose">Example application</p>
+            <p className="label text-rose">Example Application</p>
             <h2 className="mt-3 font-display text-4xl tracking-tight sm:text-6xl xl:text-7xl">
-              Meet Juniper. <em className="text-rose">Very employable.</em>
+              Meet Juniper. <em className="text-rose">Very Employable.</em>
             </h2>
           </div>
           <Link to="/create" className="btn shrink-0 bg-ink text-cream hover:bg-rose">
-            Start from scratch <ArrowRight className="size-4" />
+            Start from Scratch <ArrowRight className="size-4" />
           </Link>
         </div>
         <ResumeSheet resume={sampleResume} />
@@ -375,9 +375,9 @@ function Companion() {
         />
         <div className="relative grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div>
-            <p className="label text-gold">A companion to The Social Match Game</p>
+            <p className="label text-gold">A Companion to The Social Match Game</p>
             <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-tight sm:text-5xl xl:text-6xl">
-              Found your people? <em className="text-rose">Now send your resume.</em>
+              Found Your People? <em className="text-rose">Now Send Your Resume.</em>
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-smoke">
               The Social Match Game is where you meet the community and the details that make each member themselves.
@@ -395,7 +395,7 @@ function Companion() {
               Play The Social Match Game <ArrowUpRight className="size-4" />
             </a>
             <Link to="/create" className={`${ghostDark} px-7 py-3.5 text-base`}>
-              Write your resume first
+              Write Your Resume First
             </Link>
           </div>
         </div>
@@ -416,7 +416,7 @@ function Closing() {
         to="/create"
         className="btn-primary mt-12 px-8 py-4 text-base shadow-[0_10px_40px_-10px_rgba(179,38,62,0.9)]"
       >
-        Write yours in five minutes <ArrowRight className="size-4" />
+        Write Yours in Five Minutes <ArrowRight className="size-4" />
       </Link>
     </section>
   )

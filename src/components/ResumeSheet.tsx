@@ -59,7 +59,7 @@ export function ResumeSheet({
               className="label inline-flex items-center gap-1 text-[var(--accent)]"
               title="Name from their sign-in account; age and sex sworn under our truthful identity policy."
             >
-              <BadgeCheck className="size-3.5" /> ID checked · {PROVIDER_LABELS[resume.verifiedVia]}
+              <BadgeCheck className="size-3.5" /> ID Checked · {PROVIDER_LABELS[resume.verifiedVia]}
             </p>
           ) : null}
         </div>

@@ -90,13 +90,13 @@ function ResumePage() {
       <main className="mx-auto max-w-page px-4 sm:px-6">
         {published ? (
           <div className="no-print mb-8 rounded-lg border border-rose/25 bg-blush/50 p-5 sm:p-6">
-            <p className="font-display text-2xl">Your resume is live. 💌</p>
+            <p className="font-display text-2xl">Your Resume Is Live. 💌</p>
             <p className="mt-1 text-sm text-ink-soft">
               Share the public link anywhere. It's tied to your account, so sign in from any device to make
               revisions or add co-editors.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {[{ id: 'share', label: 'Public link', value: shareUrl }].map((row) => (
+              {[{ id: 'share', label: 'Public Link', value: shareUrl }].map((row) => (
                 <div key={row.id}>
                   <span className="label text-ink-soft">{row.label}</span>
                   <div className="mt-1 flex items-center gap-2 rounded-md border border-rule bg-sheet py-1.5 pr-1.5 pl-3">
@@ -129,7 +129,7 @@ function ResumePage() {
         <div className="no-print mb-4 flex flex-wrap items-center justify-end gap-2">
           <button type="button" className="btn-ghost" onClick={() => copy('share', shareUrl)}>
             {copied === 'share' ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied === 'share' ? 'Link copied' : 'Copy link'}
+            {copied === 'share' ? 'Link Copied' : 'Copy Link'}
           </button>
           <button type="button" className="btn-ghost" onClick={() => window.print()}>
             <Printer className="size-4" /> Print
@@ -146,9 +146,9 @@ function ResumePage() {
 
         {!showEdit ? (
           <div className="no-print mt-12 text-center">
-            <p className="font-display text-2xl italic">Looking for love too?</p>
+            <p className="font-display text-2xl italic">Looking for Love Too?</p>
             <Link to="/create" className="btn-primary mt-4">
-              Write your own Relationship Resume
+              Write Your Own Relationship Resume
             </Link>
           </div>
         ) : null}
@@ -163,11 +163,11 @@ function NotFound() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
-        <p className="label text-rose">Position filled?</p>
-        <h1 className="mt-3 font-display text-4xl">We couldn't find that resume.</h1>
+        <p className="label text-rose">Position Filled?</p>
+        <h1 className="mt-3 font-display text-4xl">We Couldn't Find That Resume.</h1>
         <p className="mt-3 text-ink-soft">The link may be mistyped, or the page may have been removed.</p>
         <Link to="/create" className="btn-primary mt-8">
-          Write your own
+          Write Your Own
         </Link>
       </main>
     </>

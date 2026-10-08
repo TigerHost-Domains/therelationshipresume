@@ -22,7 +22,7 @@ export const Route = createFileRoute('/account')({
     const [status, myResumes, identity] = await Promise.all([getMfaStatus(), listMyResumes(), getMyIdentity()])
     return { status, myResumes, identity }
   },
-  head: () => ({ meta: [{ title: 'Your account · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
+  head: () => ({ meta: [{ title: 'Your Account · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
   component: AccountPage,
 })
 
@@ -64,7 +64,7 @@ function AccountPage() {
   const codeField = (
     <form onSubmit={submit} className="mt-5 flex flex-wrap items-end gap-3">
       <label className="block">
-        <span className="label text-ink-soft">6-digit code</span>
+        <span className="label text-ink-soft">6-Digit Code</span>
         <input
           className="field mt-1.5 w-44 text-center font-mono text-lg tracking-[0.4em]"
           inputMode="numeric"
@@ -77,7 +77,7 @@ function AccountPage() {
         />
       </label>
       <button type="submit" className={status.enabled ? 'btn-ghost' : 'btn-primary'} disabled={pending}>
-        {pending ? 'One moment…' : status.enabled ? 'Turn off two-factor' : 'Confirm and turn on'}
+        {pending ? 'One Moment…' : status.enabled ? 'Turn Off Two-Factor' : 'Confirm and Turn On'}
       </button>
     </form>
   )
@@ -86,8 +86,8 @@ function AccountPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-16 lg:py-20">
-        <p className="label text-rose">Personnel file</p>
-        <h1 className="mt-3 font-display text-4xl font-medium tracking-tight">Your account</h1>
+        <p className="label text-rose">Personnel File</p>
+        <h1 className="mt-3 font-display text-4xl font-medium tracking-tight">Your Account</h1>
         <p className="mt-3 text-ink-soft">
           Signed in as <strong className="text-ink">{user.email}</strong>.{' '}
           <button
@@ -95,12 +95,12 @@ function AccountPage() {
             className="underline hover:text-ink"
             onClick={() => void logout().then(() => window.location.assign('/'))}
           >
-            Sign out
+            Sign Out
           </button>
         </p>
 
         <section className="mt-10">
-          <h2 className="font-display text-2xl">Identity on file</h2>
+          <h2 className="font-display text-2xl">Identity on File</h2>
           {identity.status === 'verified' ? (
             <IdentityOnFile identity={identity} />
           ) : identity.status === 'refused' ? (
@@ -114,7 +114,7 @@ function AccountPage() {
                 plus your sworn date of birth and sex.
               </p>
               <Link to="/verify" search={{ redirect: '/account' }} className="btn-primary mt-4">
-                Complete your identity check
+                Complete Your Identity Check
               </Link>
             </div>
           )}
@@ -126,7 +126,7 @@ function AccountPage() {
           <div className="flex items-start gap-3">
             <ShieldCheck className={`mt-1 size-5 shrink-0 ${status.enabled ? 'text-rose' : 'text-ink-soft'}`} />
             <div>
-              <h2 className="font-display text-2xl">Two-factor authentication</h2>
+              <h2 className="font-display text-2xl">Two-Factor Authentication</h2>
               <p className="mt-1 text-sm text-ink-soft">
                 {status.enabled
                   ? "On. Publishing and editing ask for a code from your authenticator app once per browser, every 12 hours."
@@ -153,7 +153,7 @@ function AccountPage() {
             </div>
           ) : (
             <button type="button" className="btn-primary mt-6" onClick={() => void begin()} disabled={pending}>
-              Set up authenticator app
+              Set Up Authenticator App
             </button>
           )}
 
@@ -186,7 +186,7 @@ function MyResumes({ resumes, canSendToSocialMatch }: { resumes: MyResume[]; can
       <div className="flex items-start gap-3">
         <FileText className="mt-1 size-5 shrink-0 text-rose" />
         <div>
-          <h2 className="font-display text-2xl">Your resumes</h2>
+          <h2 className="font-display text-2xl">Your Resumes</h2>
           <p className="mt-1 text-sm text-ink-soft">
             {resumes.length
               ? 'Every resume on file under your name, plus any you’ve been asked to co-edit. Share the link with anyone worth interviewing.'
@@ -216,7 +216,7 @@ function MyResumes({ resumes, canSendToSocialMatch }: { resumes: MyResume[]; can
                     <Link to="/r/$slug" params={{ slug: r.slug }} className="font-display text-lg hover:underline">
                       {r.name}
                     </Link>
-                    {r.role === 'co-editor' ? <span className="label ml-2 text-ink-soft">Co-editor</span> : null}
+                    {r.role === 'co-editor' ? <span className="label ml-2 text-ink-soft">Co-Editor</span> : null}
                     {r.headline ? <p className="truncate text-sm text-ink-soft">{r.headline}</p> : null}
                     <p className="mt-0.5 break-all font-mono text-xs text-ink-soft">
                       {origin}
@@ -230,7 +230,7 @@ function MyResumes({ resumes, canSendToSocialMatch }: { resumes: MyResume[]; can
                       onClick={() => void copy(r.slug)}
                     >
                       {copied === r.slug ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                      {copied === r.slug ? 'Copied' : 'Copy link'}
+                      {copied === r.slug ? 'Copied' : 'Copy Link'}
                     </button>
                     <Link
                       to="/r/$slug/edit"
@@ -249,12 +249,12 @@ function MyResumes({ resumes, canSendToSocialMatch }: { resumes: MyResume[]; can
             })}
           </ul>
           <Link to="/create" className="btn-ghost mt-6">
-            <Plus className="size-4" /> Write another resume
+            <Plus className="size-4" /> Write Another Resume
           </Link>
         </>
       ) : (
         <Link to="/create" className="btn-primary mt-6 inline-block">
-          Write your resume
+          Write Your Resume
         </Link>
       )}
     </section>

@@ -24,20 +24,20 @@ export const Route = createFileRoute('/login')({
       .optional()
       .catch(undefined),
   }),
-  head: () => ({ meta: [{ title: 'Sign in · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
+  head: () => ({ meta: [{ title: 'Sign In · The Relationship Resume' }, { name: 'robots', content: 'noindex' }] }),
   component: LoginPage,
 })
 
 const copy: Record<Mode, { eyebrow: string; title: string; blurb: string }> = {
   signin: {
-    eyebrow: 'Members only',
-    title: 'Sign in to apply.',
+    eyebrow: 'Members Only',
+    title: 'Sign In to Apply.',
     blurb:
       'One tap with Google or GitHub — the same accounts The Social Match Game uses. New here? Signing in opens your member file. No passwords to forget.',
   },
   mfa: {
-    eyebrow: 'Second interview',
-    title: 'Enter your authenticator code.',
+    eyebrow: 'Second Interview',
+    title: 'Enter Your Authenticator Code.',
     blurb: 'Open your authenticator app and type the 6-digit code for The Relationship Resume.',
   },
 }
@@ -128,7 +128,7 @@ function LoginPage() {
         {mode === 'mfa' ? (
           <form onSubmit={onSubmitCode} className="sheet mt-8 space-y-4 rounded-lg p-6">
             <label className="block">
-              <span className="label text-ink-soft">6-digit code</span>
+              <span className="label text-ink-soft">6-Digit Code</span>
               <input
                 className="field mt-1.5 text-center font-mono text-lg tracking-[0.4em]"
                 inputMode="numeric"
@@ -143,7 +143,7 @@ function LoginPage() {
             </label>
             {error && <p className="text-sm text-rose">{error}</p>}
             <button type="submit" className="btn-primary w-full" disabled={pending}>
-              {pending ? 'One moment…' : 'Verify'}
+              {pending ? 'One Moment…' : 'Verify'}
             </button>
           </form>
         ) : retired ? (
@@ -153,7 +153,7 @@ function LoginPage() {
               <strong>{user?.email}</strong> to pick up where you left off.
             </p>
             <button type="button" className="btn-primary mt-5" onClick={() => void logout()}>
-              Sign out
+              Sign Out
             </button>
           </div>
         ) : ready && user ? (
@@ -166,7 +166,7 @@ function LoginPage() {
                 Continue
               </button>
               <button type="button" className="btn-ghost" onClick={() => void logout()}>
-                Sign out
+                Sign Out
               </button>
             </div>
           </div>
@@ -195,7 +195,7 @@ function LoginPage() {
         <div className="mt-6 flex flex-wrap justify-between gap-3 text-sm text-ink-soft">
           {mode === 'mfa' && <span>Lost your phone? Ask the site's admins to reset your two-factor.</span>}
           <Link to="/" className="underline hover:text-ink">
-            Back to the homepage
+            Back to the Homepage
           </Link>
         </div>
       </main>
