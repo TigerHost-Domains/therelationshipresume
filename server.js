@@ -3,8 +3,8 @@ import * as serverEntry from './dist/server/server.js'
 
 const port = process.env.PORT || 10000
 
-// Safely resolve the handler regardless of how Vinxi structured the bundle export
-const handleRequest = serverEntry.default?.default || serverEntry.default || serverEntry.handler || serverEntry
+// Bind directly to createServerEntry from the TanStack Start bundle
+const handleRequest = serverEntry.createServerEntry || serverEntry.default?.default || serverEntry.default || serverEntry.handler
 
 const server = createServer(async (req, res) => {
   try {
@@ -12,7 +12,7 @@ const server = createServer(async (req, res) => {
       await handleRequest(req, res)
     } else {
       res.statusCode = 500
-      res.end(`Server handler not found. Available exports: ${Object.keys(serverEntry).join(', ')}`)
+      res.end('Server handler function not found.')
     }
   } catch (err) {
     console.error(err)
