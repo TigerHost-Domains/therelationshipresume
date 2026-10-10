@@ -8,7 +8,6 @@ import {
   legalNameSchema,
   MIN_AGE_RESUME,
   MIN_AGE_SOCIAL_MATCH,
-  socialProviderOf,
   type Sex,
   type SocialProvider,
 } from '@/lib/member'
@@ -28,15 +27,15 @@ export const getMyIdentity = createServerFn({ method: 'GET' })
     const { user } = context
     const row = await getProfile(user.id)
     const status = statusOf(row)
-    const provider = (row?.provider as SocialProvider | undefined) ?? socialProviderOf(user)!
+    const provider = (row?.provider as SocialProvider | undefined) ?? user.provider
     const age = status === 'verified' && row?.birthDate ? ageOn(row.birthDate) : null
     return {
       status,
       provider,
       email: row?.providerEmail ?? user.email ?? null,
       // Before the check, this is what Google/GitHub sent; afterwards, what's on file.
-      legalName: row?.legalName ?? providerName(user.name),
-      nameSource: (row?.nameSource ?? (providerName(user.name) ? 'provider' : 'attested')) as 'provider' | 'attested',
+      legalName: row?.legalName ?? providerName(user.name ?? undefined),
+      nameSource: (row?.nameSource ?? (providerName(user.name ?? undefined) ? 'provider' : 'attested')) as 'provider' | 'attested',
       birthDate: status === 'verified' ? (row?.birthDate ?? null) : null,
       sex: status === 'verified' ? ((row?.sex as Sex | null) ?? null) : null,
       age,
@@ -64,14 +63,14 @@ export const submitIdentity = createServerFn({ method: 'POST' })
       )
     }
 
-    const provider = socialProviderOf(user)!
+    const provider = user.provider
     const now = new Date()
     if (ageOn(data.birthDate, now) < MIN_AGE_RESUME) {
       await db.insert(memberProfiles).values({ userId: user.id, provider, refusedAt: now }).onConflictDoNothing()
       return { status: 'refused' as const }
     }
 
-    const fromProvider = providerName(user.name)
+    const fromProvider = providerName(user.name ?? undefined)
     const legalName = fromProvider ?? data.legalName
     if (!legalName) throw new Error('Enter your full legal name.')
 

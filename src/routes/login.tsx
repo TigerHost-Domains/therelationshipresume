@@ -1,12 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { getSettings, oauthLogin } from '@netlify/identity'
 import { z } from 'zod'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
-import { nextStepAfterSignIn } from '@/lib/auth'
+import { authClient } from '@/lib/auth-client'
+import { getEnabledProviders, nextStepAfterSignIn } from '@/lib/auth'
 import { useIdentity } from '@/lib/identity-context'
-import { socialProviderOf, type SocialProvider } from '@/lib/member'
-import { OAUTH_REDIRECT_KEY } from '@/lib/oauth'
+import { type SocialProvider } from '@/lib/member'
 import { verifyMfa } from '@/server/mfa.functions'
 
 // Sign-in is Google or GitHub only, the same doors as The Social Match Game. No passwords are made or kept here.
@@ -17,6 +16,8 @@ export const Route = createFileRoute('/login')({
   validateSearch: z.object({
     // Old links (?mode=signup, reset, invite…) fall back to the sign-in screen.
     mode: z.enum(modes).optional().catch(undefined),
+    // Set on the return trip from Google/GitHub so the next step (2FA, identity check, redirect) runs on its own.
+    done: z.literal('1').optional().catch(undefined),
     // Only same-site paths, so the redirect can't be used to bounce people elsewhere.
     redirect: z
       .string()
@@ -70,18 +71,16 @@ function LoginPage() {
   const [code, setCode] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
-  // Which social providers are switched on in the Identity settings; null until known.
+  // Which social providers have credentials configured; null until known.
   const [providers, setProviders] = useState<SocialProvider[] | null>(null)
 
   useEffect(() => {
-    getSettings()
-      .then((settings) => setProviders(SOCIAL.map((p) => p.id).filter((id) => settings.providers[id])))
+    getEnabledProviders()
+      .then(setProviders)
       .catch(() => setProviders([]))
   }, [])
 
   const redirect = search.redirect ?? '/'
-  // Sessions from the retired email + password sign-in don't count any more.
-  const retired = ready && !!user && !socialProviderOf(user)
 
   // Two-factor code if owed, then the one-time identity check, then on to where they were headed.
   const carryOn = async () => {
@@ -97,9 +96,15 @@ function LoginPage() {
   }
 
   const social = (provider: SocialProvider) => {
-    window.sessionStorage.setItem(OAUTH_REDIRECT_KEY, redirect)
-    oauthLogin(provider)
+    const callbackURL = `/login?redirect=${encodeURIComponent(redirect)}&done=1`
+    void authClient.signIn.social({ provider, callbackURL })
   }
+
+  useEffect(() => {
+    if (search.done && ready && user) void carryOn()
+    // carryOn only reads values already in the deps below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.done, ready, user])
 
   async function onSubmitCode(e: FormEvent) {
     e.preventDefault()
@@ -146,16 +151,6 @@ function LoginPage() {
               {pending ? 'One Moment…' : 'Verify'}
             </button>
           </form>
-        ) : retired ? (
-          <div className="sheet mt-8 rounded-lg p-6">
-            <p>
-              Password sign-in has been retired. Sign out, then continue with Google or GitHub using{' '}
-              <strong>{user?.email}</strong> to pick up where you left off.
-            </p>
-            <button type="button" className="btn-primary mt-5" onClick={() => void logout()}>
-              Sign Out
-            </button>
-          </div>
         ) : ready && user ? (
           <div className="sheet mt-8 rounded-lg p-6">
             <p>

@@ -1,9 +1,15 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { getUser, logout as nlLogout, onAuthChange, type User } from '@netlify/identity'
+import { createContext, useContext, type ReactNode } from 'react'
+import { authClient } from '@/lib/auth-client'
 import { endMfaSession } from '@/server/mfa.functions'
 
+interface ClientUser {
+  id: string
+  email: string
+  name: string
+}
+
 interface IdentityContextValue {
-  user: User | null
+  user: ClientUser | null
   ready: boolean
   logout: () => Promise<void>
 }
@@ -11,23 +17,15 @@ interface IdentityContextValue {
 const IdentityContext = createContext<IdentityContextValue | null>(null)
 
 export function IdentityProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    getUser().then((u) => {
-      setUser(u ?? null)
-      setReady(true)
-    })
-    return onAuthChange((_event, u) => setUser(u ?? null))
-  }, [])
+  const { data, isPending } = authClient.useSession()
 
   const logout = async () => {
     await endMfaSession().catch(() => {})
-    await nlLogout()
+    await authClient.signOut()
   }
 
-  return <IdentityContext.Provider value={{ user, ready, logout }}>{children}</IdentityContext.Provider>
+  const user = data?.user ? { id: data.user.id, email: data.user.email, name: data.user.name } : null
+  return <IdentityContext.Provider value={{ user, ready: !isPending, logout }}>{children}</IdentityContext.Provider>
 }
 
 export function useIdentity() {

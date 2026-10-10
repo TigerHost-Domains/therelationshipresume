@@ -21,24 +21,11 @@ export const IDENTITY_POLICY_VERSION = '2026-10-08'
 
 /** Error message server functions throw when the member hasn't completed the identity check yet. */
 export const IDENTITY_REQUIRED = 'Identity check required.'
-/** Error message for sessions that didn't come through Google or GitHub (e.g. a retired email + password account). */
-export const SOCIAL_SIGN_IN_REQUIRED = 'Password sign-in has been retired. Please sign in with Google or GitHub.'
-
 export const SEXES = { female: 'Female', male: 'Male', intersex: 'Intersex' } as const
 export type Sex = keyof typeof SEXES
 
 export const NAME_STYLES = ['first-initial', 'first', 'full'] as const
 export type NameStyle = (typeof NAME_STYLES)[number]
-
-type IdentityUser = { provider?: string; appMetadata?: Record<string, unknown> }
-
-/** The Google/GitHub provider behind this session, or null for anything else (email + password, other providers). */
-export function socialProviderOf(user: IdentityUser | null | undefined): SocialProvider | null {
-  if (!user) return null
-  const linked = Array.isArray(user.appMetadata?.providers) ? (user.appMetadata.providers as unknown[]) : []
-  const candidates = [user.provider, user.appMetadata?.provider, ...linked]
-  return SOCIAL_PROVIDERS.find((p) => candidates.includes(p)) ?? null
-}
 
 /** Whole years between an ISO `YYYY-MM-DD` birth date and `today` (UTC). */
 export function ageOn(birthDate: string, today = new Date()): number {

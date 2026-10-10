@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import type { User } from '@netlify/identity'
+import type { AuthUser } from '@/server/session'
 import { and, desc, eq, isNull, or, sql } from 'drizzle-orm'
 import { customAlphabet } from 'nanoid'
 import { z } from 'zod'
@@ -73,12 +73,12 @@ export const getResume = createServerFn({ method: 'GET' })
     return found ? toPublic(found.row, found.owner) : null
   })
 
-/** Identity roles (assigned in the Netlify dashboard) that may edit and manage any member's resume. */
+/** Identity roles (emails listed in PROXY_EMAILS) that may edit and manage any member's resume. */
 const PROXY_ROLES = ['admin', 'proxy']
 
 type Row = typeof resumes.$inferSelect
 
-function access(row: Row, user: User) {
+function access(row: Row, user: AuthUser) {
   const email = user.email?.toLowerCase()
   const isOwner = row.ownerId === user.id
   const isProxy = (user.roles ?? []).some((r) => PROXY_ROLES.includes(r))

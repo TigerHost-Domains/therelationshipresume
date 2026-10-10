@@ -1,6 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 
-import { CallbackHandler } from '@/components/CallbackHandler'
 import { IdentityProvider } from '@/lib/identity-context'
 
 import '../styles.css'
@@ -41,9 +40,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="grain min-h-screen">
-        <IdentityProvider>
-          <CallbackHandler>{children}</CallbackHandler>
-        </IdentityProvider>
+        <IdentityProvider>{children}</IdentityProvider>
         <Scripts />
       </body>
     </html>

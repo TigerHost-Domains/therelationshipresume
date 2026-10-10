@@ -14,7 +14,7 @@ import {
   type DraftSummary,
 } from '@/lib/drafts'
 import { useIdentity } from '@/lib/identity-context'
-import { IDENTITY_REQUIRED, MIN_AGE_RESUME, socialProviderOf, type ResumeIdentity } from '@/lib/member'
+import { IDENTITY_REQUIRED, MIN_AGE_RESUME, type ResumeIdentity } from '@/lib/member'
 import { MFA_REQUIRED } from '@/lib/mfa'
 import { emptyResume, type ResumeInput } from '@/lib/resume'
 import { cn } from '@/lib/utils'
@@ -45,7 +45,7 @@ function CreatePage() {
   const [loaded, setLoaded] = useState<{ slot: DraftSlot; resume: ResumeInput; version: number } | null>(null)
   const [drafts, setDrafts] = useState<Record<DraftSlot, DraftSummary | null>>({ 1: null, 2: null })
   const [me, setMe] = useState<Awaited<ReturnType<typeof getMyIdentity>> | null>(null)
-  const signedIn = ready && !!user && !!socialProviderOf(user)
+  const signedIn = ready && !!user
 
   useEffect(() => {
     if (!signedIn) return setMe(null)

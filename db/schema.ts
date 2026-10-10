@@ -87,3 +87,66 @@ export const memberProfiles = pgTable('member_profiles', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
+
+// Better Auth tables (sign-in with Google/GitHub). Column names follow Better Auth's defaults.
+export const authUsers = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('emailVerified').notNull().default(false),
+  image: text('image'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+})
+
+export const authSessions = pgTable(
+  'session',
+  {
+    id: text('id').primaryKey(),
+    expiresAt: timestamp('expiresAt').notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
+    updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+    ipAddress: text('ipAddress'),
+    userAgent: text('userAgent'),
+    userId: text('userId')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  (t) => [index('session_user_id_idx').on(t.userId)],
+)
+
+export const authAccounts = pgTable(
+  'account',
+  {
+    id: text('id').primaryKey(),
+    accountId: text('accountId').notNull(),
+    providerId: text('providerId').notNull(),
+    userId: text('userId')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+    accessToken: text('accessToken'),
+    refreshToken: text('refreshToken'),
+    idToken: text('idToken'),
+    accessTokenExpiresAt: timestamp('accessTokenExpiresAt'),
+    refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt'),
+    scope: text('scope'),
+    password: text('password'),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
+    updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  },
+  (t) => [index('account_user_id_idx').on(t.userId)],
+)
+
+export const authVerifications = pgTable(
+  'verification',
+  {
+    id: text('id').primaryKey(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: timestamp('expiresAt').notNull(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
+    updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  },
+  (t) => [index('verification_identifier_idx').on(t.identifier)],
+)

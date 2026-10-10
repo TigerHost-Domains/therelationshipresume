@@ -14,6 +14,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as RSlugIndexRouteImport } from './routes/r/$slug/index'
 import { Route as RSlugEditRouteImport } from './routes/r/$slug/edit'
 
@@ -42,6 +43,11 @@ const VerifyRoute = VerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RSlugIndexRoute = RSlugIndexRouteImport.update({
   id: '/r/$slug/',
   path: '/r/$slug/',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/verify': typeof VerifyRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug/': typeof RSlugIndexRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/verify': typeof VerifyRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug': typeof RSlugIndexRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/verify': typeof VerifyRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/r/$slug/edit': typeof RSlugEditRoute
   '/r/$slug/': typeof RSlugIndexRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/verify'
+    | '/api/auth/$'
     | '/r/$slug/edit'
     | '/r/$slug/'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/verify'
+    | '/api/auth/$'
     | '/r/$slug/edit'
     | '/r/$slug'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/verify'
+    | '/api/auth/$'
     | '/r/$slug/edit'
     | '/r/$slug/'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   LoginRoute: typeof LoginRoute
   VerifyRoute: typeof VerifyRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   RSlugEditRoute: typeof RSlugEditRoute
   RSlugIndexRoute: typeof RSlugIndexRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/r/$slug/': {
       id: '/r/$slug/'
       path: '/r/$slug'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   LoginRoute: LoginRoute,
   VerifyRoute: VerifyRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   RSlugEditRoute: RSlugEditRoute,
   RSlugIndexRoute: RSlugIndexRoute,
 }

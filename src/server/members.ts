@@ -1,5 +1,5 @@
 // Server-only helpers for the identity on file (member_profiles): lookups, age gates, and what a resume displays.
-import type { User } from '@netlify/identity'
+import type { AuthUser } from '@/server/session'
 import { eq } from 'drizzle-orm'
 import { db } from '../../db/index.js'
 import { memberProfiles } from '../../db/schema.js'
@@ -35,7 +35,7 @@ export function identityOf(row: ProfileRow | undefined | null): ResumeIdentity |
  * The signed-in member's verified identity, provided they're at least `minAge`. Throws `IDENTITY_REQUIRED` when the
  * check hasn't been done, and a member-facing message when they're too young.
  */
-export async function requireIdentity(user: User, minAge: number): Promise<ResumeIdentity> {
+export async function requireIdentity(user: AuthUser, minAge: number): Promise<ResumeIdentity> {
   const row = await getProfile(user.id)
   const status = statusOf(row)
   if (status === 'refused') throw new Error('Relationship Resumes are for members 18 and over.')

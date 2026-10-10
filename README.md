@@ -17,19 +17,24 @@ to a shareable link for dating profiles, bios, or matchmaking friends.
 
 - [TanStack Start](https://tanstack.com/start) (React 19, file-based routing, server functions)
 - Tailwind CSS 4
-- Netlify Database (managed Postgres) via Drizzle ORM
+- Postgres via Drizzle ORM, sign-in via Better Auth (Google / GitHub)
 - Zod for validation on both client and server
-- Deployed on Netlify
+- Deployed on Render (`render.yaml`)
 
 ## Running locally
 
 ```bash
-pnpm install
-netlify dev
+npm install
+export DATABASE_URL=postgres://user:pass@localhost:5432/resume
+export BETTER_AUTH_SECRET=<random string> BETTER_AUTH_URL=http://localhost:3000
+export GITHUB_CLIENT_ID=… GITHUB_CLIENT_SECRET=…   # and/or GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+npm run db:migrate
+npm run dev
 ```
 
-`netlify dev` provides local emulation of Netlify Database. Schema changes live in `db/schema.ts`; generate a
-migration with `npx drizzle-kit generate --name <change_name>` — migrations are applied automatically on deploy.
+Schema changes live in `db/schema.ts`; generate a migration with `npx drizzle-kit generate --name <change_name>`.
+On Render, `npm start` applies pending migrations before the server starts. Set `PROXY_EMAILS` (comma-separated) to
+give admins edit access to any resume.
 
 ## Ideas for later
 

@@ -6,10 +6,11 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 
 - **TanStack Start** app (`src/routes`, file-based). Server logic uses `createServerFn` in
   `src/server/resumes.functions.ts` — there are no separate Netlify Functions.
-- **Netlify Database** (Postgres) through Drizzle (`drizzle-orm@beta` / `drizzle-kit@beta` — the beta line is required
-  for the `drizzle-orm/netlify-db` adapter). Schema: `db/schema.ts`, client: `db/index.ts`, migrations:
-  `netlify/database/migrations/` (generated with `npx drizzle-kit generate --name <name>`; never hand-edit applied ones).
-- Tables: `resumes`, `member_profiles` (identity on file), `member_mfa`, `mfa_sessions`. List-like resume fields (likes, experience, references, …) are `jsonb` columns.
+- **Postgres on Render** through Drizzle (`drizzle-orm@beta`, `node-postgres` driver, `DATABASE_URL`). Schema: `db/schema.ts`,
+  client: `db/index.ts`, migrations: `netlify/database/migrations/` (generated with `npx drizzle-kit generate --name <name>`;
+  never hand-edit applied ones). `npm start` runs `migrate.mjs` and then `server.mjs` (srvx serving `dist/client` + the
+  TanStack handler). Deployed with `render.yaml`; `.npmrc` sets `legacy-peer-deps` for Better Auth's optional drizzle peer.
+- Tables: `resumes`, `member_profiles` (identity on file), `member_mfa`, `mfa_sessions`, plus Better Auth's `user`, `session`, `account`, `verification` (camelCase columns, as Better Auth expects with a raw `pg` pool). List-like resume fields (likes, experience, references, …) are `jsonb` columns.
 
 ## Key files
 
@@ -27,33 +28,34 @@ The Relationship Resume: a builder where anyone writes a dating-focused, one-pag
 | `src/routes/login.tsx` | Google/GitHub sign-in and the two-factor code screen (`?redirect=` returns the member afterwards) |
 | `src/routes/verify.tsx`, `src/components/IdentityOnFile.tsx` | One-time identity check (name from provider, sworn date of birth + sex) and the locked summary |
 | `src/lib/member.ts`, `src/server/members.ts`, `src/server/members.functions.ts` | Identity rules (providers, 18/21 age gates, policy version, name styles), `requireIdentity`, `getMyIdentity` / `submitIdentity` |
-| `src/lib/auth.ts`, `src/middleware/identity.ts`, `src/lib/identity-context.tsx` | Netlify Identity (`@netlify/identity`): server user lookup, `requireAuthMiddleware`, client auth state |
+| `src/server/auth.ts`, `src/server/session.ts`, `src/routes/api/auth/$.ts`, `src/lib/auth-client.ts` | Better Auth instance (Google/GitHub), `currentUser()`, the `/api/auth/*` handler, browser client |
+| `src/lib/auth.ts`, `src/middleware/identity.ts`, `src/lib/identity-context.tsx` | `getServerUser`, `getEnabledProviders`, `requireAuthMiddleware`, client auth state |
 | `src/routes/account.tsx`, `src/server/mfa.ts`, `src/server/mfa.functions.ts` | Account page: the member's resume links (`listMyResumes`, owned + co-edited) and optional authenticator-app (TOTP) two-factor setup/disable, code checks, 2FA browser sessions |
 | `src/components/SocialMatchConnect.tsx`, `src/server/social-match.ts`, `src/lib/social-match.ts` | "Add to Social Match" button/dialog on the public resume page (and, compact, on each account-page resume row) and the server-side client that requests a Social Match Game invite for the resume |
 
 ## Non-obvious decisions
 
-- **Ownership.** Publishing requires a Netlify Identity sign-in; `owner_id` stores the creator's Identity user id.
+- **Ownership.** Publishing requires a sign-in; `owner_id` stores the creator's Better Auth user id.
   Edit permission (`access()` in `resumes.functions.ts`) = owner, a co-editor (`editor_emails`, managed by the owner),
-  or a member with an Identity role in `PROXY_ROLES` (`admin`, `proxy`, assigned in the Netlify dashboard). Every edit
+  or a member whose verified email is listed in the `PROXY_EMAILS` env var (comma-separated; they get the `proxy` role). Every edit
   server function re-checks this; the UI checks are cosmetic. Viewing stays public.
 - **Legacy edit tokens.** Resumes predating accounts have no owner; the first signed-in member who opens a valid
   `?key=` edit link claims them. `edit_token` is still generated but no longer shown. `toPublic()` strips it, along with
   owner and editor fields — never return the raw row to the client.
-- **Sign-in is Google or GitHub only** (the same doors as The Social Match Game), via Identity's `oauthLogin`; buttons
-  only render for providers enabled in Project configuration > Identity > External providers (`getSettings()`). There
-  is no email/password: the middleware and `getServerUser` treat any session without a Google/GitHub provider as
-  signed out (`socialProviderOf`). The return path is parked in sessionStorage (`src/lib/oauth.ts`); after sign-in
-  `nextStepAfterSignIn` routes to the 2FA code, then `/verify`, then the redirect.
+- **Sign-in is Google or GitHub only** (the same doors as The Social Match Game), via Better Auth's `signIn.social`;
+  buttons only render for providers whose `*_CLIENT_ID`/`*_CLIENT_SECRET` env vars are set (`getEnabledProviders`).
+  There is no email/password: `currentUser()` returns null for any session without a Google/GitHub `account` row.
+  The OAuth callback returns to `/login?redirect=…&done=1`, which runs `nextStepAfterSignIn` (2FA code, then
+  `/verify`, then the redirect). Callback URLs to register: `$BETTER_AUTH_URL/api/auth/callback/{google,github}`.
 - **Truthful identity.** `member_profiles` holds each member's name (from the provider; typed only if the provider
   shared none), sworn date of birth and sex, policy version and attestation time — written once, never editable by
   the member. Under-18 answers store only `refused_at`. Resumes never trust typed name/age: the server derives them
   from the *owner's* profile (`name_style` picks first / first + initial / full) and `toPublic()` adds sex and
   `verifiedVia`. Publishing and editing need `requireIdentity(user, 18)`; `IDENTITY_REQUIRED` → `/verify`.
-- **Two-factor is ours, not Identity's.** `member_mfa` holds each member's TOTP secret; passing a code sets an httpOnly
+- **Two-factor is ours, not Better Auth's.** `member_mfa` holds each member's TOTP secret; passing a code sets an httpOnly
   `rr_mfa` cookie backed by a hashed row in `mfa_sessions` (12h). `requireAuthMiddleware` enforces it for publishing
   and editing (`MFA_REQUIRED` error → `/login?mode=mfa`); `requireSignInMiddleware` skips it for the 2FA endpoints.
-- Identity only works on deployed Netlify sites, not localhost. `/create` autosaves up to two drafts in localStorage (signed in or not); publishing clears that slot.
+- `/create` autosaves up to two drafts in localStorage (signed in or not); publishing clears that slot.
 - Slugs are `<name-slug>-<6 random chars>` so they're friendly but not guessable/enumerable.
 - Design system: Fraunces (display), Instrument Sans (body), IBM Plex Mono (labels), loaded from Google Fonts in
   `__root.tsx`. Colour tokens (`paper`, `sheet`, `ink`, `rose`, `blush`, `rule`) are in `src/styles.css` `@theme`;
