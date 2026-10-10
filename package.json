@@ -6,7 +6,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "start": "node dist/server/server.js"
-  }
+  },
   "dependencies": {
     "@netlify/database": "^2.0.1",
     "@netlify/identity": "^2.0.0",
