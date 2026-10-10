@@ -13,7 +13,4 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
   ],
-  server: {
-    preset: 'node-server',
-  },
 })
