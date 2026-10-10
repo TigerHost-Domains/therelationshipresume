@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "start": "node server.mjs",
-    "db:migrate": "drizzle-kit migrate"
+    "start": "node migrate.mjs && node server.mjs",
+    "db:migrate": "node migrate.mjs"
   },
   "dependencies": {
     "@netlify/identity": "^2.0.0",
