@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build",
-    "start": "node .output/server/index.mjs"
+    "build": "vite build"
   },
   "dependencies": {
     "@netlify/database": "^2.0.1",
